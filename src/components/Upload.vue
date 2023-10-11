@@ -2,6 +2,10 @@
   <v-container class="fill-height">
     <v-responsive class="px-4 py-4 fill-height">
       <h3 class="text-h4 font-weight-bold">Upload</h3>
+    
+      <v-btn variant="outlined" @click="getHello()">
+          {{ text }}
+      </v-btn>
 
       <div class="py-6" />
     
@@ -87,6 +91,22 @@
   </v-container>
 </template>
 
-<script lang="ts" setup>
-  //
+<script lang='ts'>
+import axios from 'axios';
+
+export default {
+    data() {
+        return {
+            text: "Press"
+        }
+    },
+    methods: {
+        async getHello() {
+            this.text = await axios({
+                method: 'get',
+                url: '/api/hello'
+            });
+        }
+    }
+}
 </script>
