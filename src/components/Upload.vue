@@ -83,7 +83,7 @@
               start
             />
 
-            Upload
+            Uploadd
           </v-btn>
         </v-col>
       </v-row>
@@ -92,7 +92,8 @@
 </template>
 
 <script lang='ts'>
-import axios from 'axios';
+import Vue from "vue";
+import axios from "axios";
 
 export default {
     data() {
@@ -102,10 +103,7 @@ export default {
     },
     methods: {
         async getHello() {
-            this.text = await axios({
-                method: 'get',
-                url: '/api/hello'
-            });
+            this.text = await this.axios.get("/api/welcome").then(response => response.data);
         }
     }
 }
