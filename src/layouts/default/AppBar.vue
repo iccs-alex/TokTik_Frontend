@@ -6,7 +6,7 @@
     </v-app-bar-title>
 
     <template v-slot:append>
-        <v-btn prepend-icon="mdi-plus">Upload</v-btn>
+        <v-btn @click="$router.push('/Upload')" prepend-icon="mdi-plus" class="mr-2">Upload</v-btn>
         <v-btn variant="outlined">Login</v-btn>
     </template>
   </v-app-bar>
