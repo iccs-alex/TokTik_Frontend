@@ -4,7 +4,7 @@
       <h3 class="text-h4 font-weight-bold">Upload</h3>
       <div class="py-6" />
     
-      <div class="d-flex justify-space-between mb-12 ">
+      <div class="d-flex justify-space-between">
         <v-col class="d-flex flex-column justify-space-between">
           <v-row class="d-flex flex-column">
                 <h3 class="text-h6">Title</h3>
@@ -41,6 +41,10 @@
             </v-row>
         </v-col>
       </div>
+
+      <li class="text-red" v-for="error in errors">
+        {{ error }}
+      </li>
 
       <v-row class="d-flex align-center justify-end">
         <v-col cols="auto">
@@ -93,6 +97,7 @@ export default {
     data() {
         return {
             file: null,
+            errors: [],
         }
     },
     methods: {
@@ -107,11 +112,11 @@ export default {
             }
         },
         async upload() {
+            if(this.checkErrors() === -1) return;
             const videoInput: HTMLInputElement = document.querySelector('#videoInput');
             if (videoInput == null) return;
 
             const videoFile = videoInput.files[0];
-            console.log('File: ' + videoFile); 
             if(videoFile == null) return;
             
             const url = await this.getPresignedUrl("PUT");
@@ -126,17 +131,34 @@ export default {
         },
         async getVideo() {
             const url = await this.getPresignedUrl("GET");
-            console.log(url);
 
             const res = await fetch(url, {
               method: "GET",
               headers: {
               },
             })
-            console.log(res);
         },
         inputFileChange(event: any): void {
             this.file = event.target.value;
+        },
+        checkErrors(): number {
+            this.errors = [];
+            const titleInput: HTMLInputElement = document.querySelector('#titleInput');
+            const videoInput: HTMLInputElement = document.querySelector('#videoInput');
+            if(titleInput.value === "") {
+                this.errors.push("Please specify a title.")
+            }
+
+            if(videoInput.files[0] == null) {
+                this.errors.push("Please drop a video file.")
+            }
+            else if(videoInput.files[0].type.split("/")[0] !== "video") {
+                this.errors.push("The file must be a video file.")
+            }
+
+            if(this.errors.length === 0)
+                return 1;
+            return -1;
         }
     }
 }

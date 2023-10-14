@@ -17,7 +17,7 @@ const routes = [
         component: () => import('@/components/Upload.vue'),
       },
       {
-        path: 'videos',
+        path: 'videolist',
         name: 'VideoList',
         component: () => import('@/components/VideoList.vue'),
       },
