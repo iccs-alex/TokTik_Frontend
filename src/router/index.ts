@@ -23,6 +23,11 @@ const routes = [
       },
     ],
   },
+  {
+    path: '/login',
+    component: () => import('@/views/Login.vue'),
+    children: []
+  },
 ]
 
 const router = createRouter({

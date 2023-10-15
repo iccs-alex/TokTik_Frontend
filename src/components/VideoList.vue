@@ -26,7 +26,7 @@ import { ref } from 'vue';
 
 export default {
     data() {
-        let videos = ref([{title: "ASD", description: "this is a des"}]);
+        let videos = ref([]);
         return {
             videos
         }
