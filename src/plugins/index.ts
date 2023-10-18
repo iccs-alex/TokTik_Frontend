@@ -11,7 +11,6 @@ import router from '../router'
 import axios from "axios"
 import Vue from "vue"
 import VueAxios from "vue-axios"
-import VeeValidate from 'vee-validate'
 
 // Types
 import type { App } from 'vue'
@@ -22,5 +21,4 @@ export function registerPlugins (app: App) {
     .use(router)
     .use(pinia)
     .use(VueAxios, axios)
-    .use(VeeValidate)
 }

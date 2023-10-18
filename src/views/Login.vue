@@ -4,14 +4,13 @@
           <v-sheet width="300" class="mx-auto h-100">
             <v-form ref="form">
               <v-text-field
-                v-model="state.username"
-                :counter="10"
-                :rules="nameRules"
+                v-model="username"
+                :rules="usernameRules"
                 label="Username"
                 required
                 ></v-text-field>
               <v-text-field
-                v-model="state.password"
+                v-model="password"
                 :rules="passwordRules"
                 label="Password"
                 required
@@ -19,10 +18,10 @@
 
               <div class="d-flex flex-column">
                 <v-btn
-                  color="primary"
+                  :disable="!valid"
+                  color="success"
                   class="mt-4"
-                  block
-                  @click="validate"
+                  @click="submit"
                 >
                   Log in
                 </v-btn>
@@ -43,29 +42,35 @@
 </template>
 
 <script lang='ts'>
-import Vue from "vue";
 import axios from "axios";
-import { ref } from 'vue';
-import { reactive } from 'vue'
-
-const initialState = {
-    username: '',
-    password: '',
-}
-
-const state = reactive({
-    initialState,
-})
-
-const name = useField('username')
 
 export default {
-    data() {
-        return {
+  data: () => ({
+    valid: true,
+    username: "blue",
+    password: "shad",
+    usernameRules: [(v: boolean) => !!v || "Username is required"],
+    passwordRules: [(v: boolean) => !!v || "Password is required"],
+  }),
+
+  methods: {
+    async submit() {
+      if ((this.$refs.form as any).validate()) {
+        // submit to backend to authenticate
+        let formData = new FormData()
+        formData.append("username", this.username);
+        formData.append("password", this.password);
+
+        let response = await axios.post("/api/login", formData);
+
+        if (response.data.success) {
+          await this.$router.push({ path: "/" });
         }
+      }
     },
-    methods: {
-    
+    reset() {
+      (this.$refs.form as any).reset();
     },
+  },
 }
 </script>

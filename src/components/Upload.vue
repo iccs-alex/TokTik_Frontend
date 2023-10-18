@@ -20,6 +20,7 @@
                 <v-textarea
                   clearable
                   variant="outlined"
+                  id="descriptionInput"
 
                 />
           </v-row>
@@ -92,6 +93,7 @@
 import Vue from "vue";
 import axios from "axios";
 import { ref } from 'vue';
+import crypto from 'crypto-random-string';
 
 export default {
     data() {
@@ -103,9 +105,12 @@ export default {
     methods: {
         async getPresignedUrl(method: String) {
             const titleInput: HTMLInputElement = document.querySelector('#titleInput');
+            const descriptionInput: HTMLInputElement = document.querySelector('#descriptionInput');
             const title = titleInput.value;
+            const description = descriptionInput.value;
             if(method === "PUT") {
-                return this.axios.put("/api/video?key="+title).then(response => response.data);
+                const key: String = crypto({length: 16}); 
+                return this.axios.put("/api/video", {key: key, title: title, description: description}).then(response => response.data);
             }
             else if(method === "GET") {
                 return this.axios.get("/api/video?key="+title).then(response => response.data);
@@ -120,7 +125,7 @@ export default {
             if(videoFile == null) return;
             
             const url = await this.getPresignedUrl("PUT");
-
+            
             await fetch(url, {
               method: "PUT",
               headers: {
