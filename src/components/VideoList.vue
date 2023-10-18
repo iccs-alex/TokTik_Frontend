@@ -9,8 +9,9 @@
         <v-card variant="elevated" color="secondary" v-for="video in videos" class="mb-10">
             <v-card-title class="">{{ video.title }}</v-card-title>
             <v-card-text>{{ video.description }}</v-card-text>
+            <v-card-text>{{ video.key }}</v-card-text>
             <v-card-actions>
-                <v-btn @click="deleteVideo(video.title)" variant="tonal" icon="mdi-delete"></v-btn>
+                <v-btn @click="deleteVideo(video.key)" variant="tonal" icon="mdi-delete"></v-btn>
             </v-card-actions>
         </v-card>
       </div>
@@ -38,8 +39,9 @@ export default {
             );
             console.log(this.videos);
         },
-        async deleteVideo(title: String) {
-            const url = await this.axios.delete("/api/video?key="+title).then(response => response.data);
+        async deleteVideo(key: String) {
+            console.log(key);
+            const url = await this.axios.delete("/api/video?key="+key).then(response => response.data);
             console.log(url);
 
             await fetch(url, {
