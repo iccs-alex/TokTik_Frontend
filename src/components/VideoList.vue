@@ -5,6 +5,7 @@
       
       <div class="py-6" />
       <v-btn prepend-icon="mdi-refresh" @click="getVideos">Refresh</v-btn>
+      <v-btn prepend-icon="mdi-refresh" @click="testPublish">Publish</v-btn>
       <div class="d-flex flex-column justify-space-between mb-12 ">
         <v-card variant="elevated" color="secondary" v-for="video in videos" class="mb-10">
             <v-card-title class="">{{ video.title }}</v-card-title>
@@ -34,6 +35,14 @@ export default {
         }
     },
     methods: {
+        async testPublish() {
+            const res = await this.axios({method: 'post', 
+                                          url:'/api/publish', 
+                                          data: { id: '1234',
+                                                  videoKey: 'frontendishere'
+                                          }}).then(response => response.data)
+            console.log(res);
+        },
         async getVideos() {
             this.videos = ref(
                 await this.axios.get("/api/videos").then(response => response.data)
