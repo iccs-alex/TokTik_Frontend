@@ -11,6 +11,7 @@
             <v-card-text>{{ video.description }}</v-card-text>
             <v-card-text>{{ video.key }}</v-card-text>
             <v-card-actions>
+                <v-btn @click="playVideo(video.key)" variant="tonal" icon="mdi-play"></v-btn>
                 <v-btn @click="deleteVideo(video.key)" variant="tonal" icon="mdi-delete"></v-btn>
             </v-card-actions>
         </v-card>
@@ -29,7 +30,7 @@ export default {
     data() {
         let videos = ref([]);
         return {
-            videos
+            videos,
         }
     },
     methods: {
@@ -51,6 +52,9 @@ export default {
 
             this.getVideos();
         },
+        playVideo(key: String) {
+            this.$router.push({name: 'PlayVideo', params: {key: key as any} }); 
+        }
     },
 }
 </script>

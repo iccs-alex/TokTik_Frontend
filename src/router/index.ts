@@ -20,7 +20,14 @@ const routes = [
         path: 'videolist',
         name: 'VideoList',
         component: () => import('@/components/VideoList.vue'),
+
       },
+      {
+        path: 'PlayVideo/:key',
+        name: 'PlayVideo',
+        component: () => import('@/components/PlayVideo.vue'),
+      },
+
     ],
   },
   {

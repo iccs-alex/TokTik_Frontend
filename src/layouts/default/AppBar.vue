@@ -1,6 +1,6 @@
 <template>
   <v-app-bar :elevation="5">
-    <v-app-bar-title>
+    <v-app-bar-title @click="$router.push('/')">
       <v-icon icon="mdi-music-circle-outline" />
       TokTik
     </v-app-bar-title>
