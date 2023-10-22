@@ -100,6 +100,7 @@ export default {
         return {
             file: null,
             errors: [],
+            key: "",
         }
     },
     methods: {
@@ -109,7 +110,8 @@ export default {
             const title = titleInput.value;
             const description = descriptionInput.value;
             if(method === "PUT") {
-                const key: String = crypto({length: 16}); 
+                const key: string = crypto({length: 16}); 
+                this.key = key;
                 return this.axios.put("/api/video", {key: key, title: title, description: description}).then(response => response.data);
             }
             else if(method === "GET") {
@@ -126,6 +128,7 @@ export default {
             
             const url = await this.getPresignedUrl("PUT");
             
+            // Sends request to upload the video
             await fetch(url, {
               method: "PUT",
               headers: {
@@ -133,6 +136,10 @@ export default {
               },
               body: videoFile
             })
+
+            //Sends request to start the conversion/thumbnail/chunking process
+            const res = this.axios.post("/api/publish", {videoKey: this.key}).then(response => response.data);
+        
         },
         async getVideo() {
             const url = await this.getPresignedUrl("GET");
