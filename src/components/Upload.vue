@@ -127,19 +127,20 @@ export default {
             if(videoFile == null) return;
             
             const url = await this.getPresignedUrl("PUT");
-            
+
             // Sends request to upload the video
             await fetch(url, {
               method: "PUT",
               headers: {
                 "Content-Length": "" + videoFile.length,
+                "Content-Type": "video/mp4",
               },
               body: videoFile
             })
 
             //Sends request to start the conversion/thumbnail/chunking process
             const res = this.axios.post("/api/publish", {videoKey: this.key}).then(response => response.data);
-        
+
         },
         async getVideo() {
             const url = await this.getPresignedUrl("GET");
