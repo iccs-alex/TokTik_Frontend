@@ -36,12 +36,14 @@ export default {
                             method: "GET",
                             headers: {},
                           });
-
+            console.log(video_)
             const blob = video_.blob().then(blob => {
+                console.log(blob)
                 const videoUrl = URL.createObjectURL(blob)
                 const videoPlayer: HTMLVideoElement = document.querySelector('#videoId');
                 videoPlayer.src = videoUrl
                 videoPlayer.play()
+                console.log(blob)
             })
             return video_.body;
         }

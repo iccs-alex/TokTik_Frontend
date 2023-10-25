@@ -10,6 +10,12 @@
             <v-card-title class="">{{ video.title }}</v-card-title>
             <v-card-text>{{ video.description }}</v-card-text>
             <v-card-text>{{ video.key }}</v-card-text>
+            <img
+                :id="'thumbnail-'+video.key"
+                :src="thumbnail"
+                height="200px"
+                cover
+            >
             <v-card-actions>
                 <v-btn @click="playVideo(video.key)" variant="tonal" icon="mdi-play"></v-btn>
                 <v-btn @click="deleteVideo(video.key)" variant="tonal" icon="mdi-delete"></v-btn>
@@ -28,17 +34,32 @@ import { ref } from 'vue';
 
 export default {
     data() {
-        let videos = ref([]);
+        let videos = ref([])
+        let thumbnail = ref("https://news.artnet.com/app/news-upload/2019/01/Cat-Photog-Feat-256x256.jpg")
         return {
             videos,
+            thumbnail,
         }
     },
     methods: {
         async getVideos() {
-            this.videos = ref(
-                await this.axios.get("/api/videos").then(response => response.data)
-            );
-            console.log(this.videos);
+            let videos  = await this.axios.get("/api/videos").then(response => response.data);
+            this.videos = ref(videos)
+            for(let i = 0; i < videos.length; i++) {
+                const url = await this.axios.get("/api/video?key=thumbnail/"+videos[i].key).then(response => response.data)
+                const thumbnail_bytes = await fetch(url, { method: "GET", headers: {} })
+                console.log(thumbnail_bytes)
+                const thumbnail_blob = thumbnail_bytes.blob().then(blob => {
+                    const thumbnailUrl = URL.createObjectURL(blob)
+             
+                    const thumbnailEl: HTMLImageElement = document.querySelector('#thumbnail-'+videos[i].key);
+                    thumbnailEl.src = thumbnailUrl
+                    console.log(thumbnailEl)
+                    console.log(thumbnailEl.src)
+                    console.log(blob)
+                    console.log(thumbnailUrl)
+                })
+            }
         },
         async deleteVideo(key: String) {
             console.log(key);
