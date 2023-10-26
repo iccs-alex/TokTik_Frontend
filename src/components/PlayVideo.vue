@@ -3,21 +3,19 @@
     <v-responsive class="px-4 py-4 fill-height">
       <div class="py-6" />
       <v-btn prepend-icon="mdi-refresh" @click="getVideo">Refresh</v-btn>
-      <div class="d-flex flex-column justify-space-between mb-12 ">
-        {{ $route.params.key }}
-        <v-card variant="elevated" color="secondary" class="mb-10">
+      {{ $route.params.key }}
+      <div class="d-flex mb-12 justify-center">
             <video 
                 ref="videoPlayer"
                 width="500"
-                height="300"
-                class="video-js vjs-default-skin"
+                height="600"
+                class=" video-js vjs-default-skin videoPlayer"
                 preload="auto"
                 :poster="'https://toktik-videos.s3.ap-southeast-1.amazonaws.com/thumbnail/' + $route.params.key"
                 controls
                 data-setup="{}">
                 <source type="application/x-mpegURL" :src="'https://toktik-videos.s3.ap-southeast-1.amazonaws.com/chunked_videos/' + $route.params.key + '/playlist.m3u8'" />
             </video>
-        </v-card>
       </div>
     </v-responsive>
   </v-container>

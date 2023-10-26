@@ -6,22 +6,39 @@
             <div class="py-6" />
             <v-btn prepend-icon="mdi-refresh" @click="getVideos">Refresh</v-btn>
             <div class="d-flex flex-column justify-space-between mb-12 ">
-                <v-card variant="elevated" color="secondary" v-for="video in videos" class="mb-10">
-                    <div class="d-flex flex-no-wrap">
-                        <v-avatar class="ma-3" size="200" rounded="0">
-                            <img :id="'thumbnail-' + splitVideoKey(video.key)" :src="thumbnail">
-                        </v-avatar>
-                        <div>
-                            <v-card-title class="">{{ video.title }}</v-card-title>
-                            <v-card-text>{{ video.description }}</v-card-text>
-                            <v-card-text>{{ splitVideoKey(video.key) }}</v-card-text>
-                        </div>
-                    </div>
-                    <v-card-actions>
-                        <v-btn @click="playVideo(splitVideoKey(video.key))" variant="tonal" icon="mdi-play"></v-btn>
-                        <v-btn @click="deleteVideo(splitVideoKey(video.key))" variant="tonal" icon="mdi-delete"></v-btn>
-                    </v-card-actions>
-                </v-card>
+                <div v-for="video in videos">
+                    <v-card variant="elevated" color="secondary" class="mb-10">
+                        <template v-if="video.status == 1">
+                            <div class="d-flex flex-no-wrap">
+                                <v-avatar class="ma-3" size="200" rounded="0">
+                                    <img :id="'thumbnail-' + video.key" :src="thumbnail">
+                                </v-avatar>
+                                <div>
+                                    <v-card-title class="">{{ video.title }}</v-card-title>
+                                    <v-card-text>{{ video.description }}</v-card-text>
+                                    <v-card-text>{{ (video.key) }}</v-card-text>
+                                </div>
+                            </div>
+                            <v-card-actions>
+                                <v-btn @click="playVideo(video.key)" variant="tonal" icon="mdi-play"></v-btn>
+                                <v-btn @click="deleteVideo(video.key)" variant="tonal" icon="mdi-delete"></v-btn>
+                            </v-card-actions>
+                        </template>
+                        <template v-else>
+                            <div class="d-flex flex-no-wrap">
+                                <div>
+                                    <v-card-title class="">{{ video.title }}</v-card-title>
+                                    <v-card-text>{{ video.description }}</v-card-text>
+                                    <v-card-text>{{ video.key }}</v-card-text>
+                                    <v-card-text>{{ video.status }}</v-card-text>
+                                </div>
+                                <div>
+                                    Processing...
+                                </div>
+                            </div>
+                        </template>
+                    </v-card>
+                </div>
             </div>
         </v-responsive>
     </v-container>
@@ -43,25 +60,37 @@ export default {
         }
     },
     methods: {
-        splitVideoKey(key: string) {
-            return key.split("/")[1]
-        },
         async getVideos() {
             let videos = await this.axios.get("/api/videos").then(response => response.data);
             this.videos = ref(videos)
             for (let i = 0; i < videos.length; i++) {
-                const url = await this.axios.get("/api/video?key=thumbnail/" + this.splitVideoKey(videos[i].key)).then(response => response.data)
-                const thumbnail_bytes = await fetch(url, { method: "GET", headers: {} })
+                console.log(videos[i])
+                const playlist_url = await this.axios.get("/api/video?key=chunked_videos/" + videos[i].key + "/playlist.m3u8").then(response => response.data)
+                const response = await fetch(playlist_url, { method: "GET", headers: {} })
+                if(response.status == 404) {
+                    console.log("404 " + response.status)
+                    videos[i]["status"] = 0
+                    console.log(videos[i].status)
+                    continue
+                } else {
+                    console.log("200 " + response.status)
+                    videos[i]["status"] = 1
+                    console.log(videos[i].status)
+                }
+                this.videos = ref(videos)
+
+                const thumbnail_url = await this.axios.get("/api/video?key=thumbnail/" + videos[i].key).then(response => response.data)
+                const thumbnail_bytes = await fetch(thumbnail_url, { method: "GET", headers: {} })
 
                 const thumbnail_blob = thumbnail_bytes.blob().then(blob => {
                     const thumbnailUrl = URL.createObjectURL(blob)
 
-                    const thumbnailEl: HTMLImageElement = document.querySelector('#thumbnail-' + this.splitVideoKey(videos[i].key));
+                    const thumbnailEl: HTMLImageElement = document.querySelector('#thumbnail-' + videos[i].key);
                     thumbnailEl.src = thumbnailUrl
                 })
             }
         },
-        async deleteVideo(key: String) {
+        async deleteVideo(key: string) {
             const url = await this.axios.delete("/api/video?key=" + key).then(response => response.data);
 
             await fetch(url, {

@@ -5,3 +5,6 @@
   background-color: #ff5722; /* Customize progress bar color */
 }
 
+.videoPlayer {
+    border-radius: "20px";
+}

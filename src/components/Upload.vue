@@ -77,7 +77,7 @@ export default {
       if (method === "PUT") {
         const key: string = crypto({ length: 16 });
         this.key = key;
-        return this.axios.put("/api/video", { key: 'videos/' + key, title: title, description: description }).then(response => response.data);
+        return this.axios.put("/api/video", { key: key, title: title, description: description }).then(response => response.data);
       }
       else if (method === "GET") {
         return this.axios.get("/api/video?key=" + 'videos/' + title).then(response => response.data);
