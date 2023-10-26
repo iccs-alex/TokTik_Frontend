@@ -1,0 +1,7 @@
+.vjs-default-skin .vjs-control-bar {
+  background-color: #333;
+}
+.vjs-default-skin .vjs-play-progress {
+  background-color: #ff5722; /* Customize progress bar color */
+}
+

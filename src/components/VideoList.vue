@@ -9,17 +9,17 @@
                 <v-card variant="elevated" color="secondary" v-for="video in videos" class="mb-10">
                     <div class="d-flex flex-no-wrap">
                         <v-avatar class="ma-3" size="200" rounded="0">
-                            <img :id="'thumbnail-' + video.key" :src="thumbnail">
+                            <img :id="'thumbnail-' + splitVideoKey(video.key)" :src="thumbnail">
                         </v-avatar>
                         <div>
                             <v-card-title class="">{{ video.title }}</v-card-title>
                             <v-card-text>{{ video.description }}</v-card-text>
-                            <v-card-text>{{ video.key }}</v-card-text>
+                            <v-card-text>{{ splitVideoKey(video.key) }}</v-card-text>
                         </div>
                     </div>
                     <v-card-actions>
-                        <v-btn @click="playVideo(video.key)" variant="tonal" icon="mdi-play"></v-btn>
-                        <v-btn @click="deleteVideo(video.key)" variant="tonal" icon="mdi-delete"></v-btn>
+                        <v-btn @click="playVideo(splitVideoKey(video.key))" variant="tonal" icon="mdi-play"></v-btn>
+                        <v-btn @click="deleteVideo(splitVideoKey(video.key))" variant="tonal" icon="mdi-delete"></v-btn>
                     </v-card-actions>
                 </v-card>
             </div>
@@ -43,26 +43,26 @@ export default {
         }
     },
     methods: {
+        splitVideoKey(key: string) {
+            return key.split("/")[1]
+        },
         async getVideos() {
             let videos = await this.axios.get("/api/videos").then(response => response.data);
             this.videos = ref(videos)
             for (let i = 0; i < videos.length; i++) {
-                const url = await this.axios.get("/api/video?key=thumbnail/" + videos[i].key).then(response => response.data)
+                const url = await this.axios.get("/api/video?key=thumbnail/" + this.splitVideoKey(videos[i].key)).then(response => response.data)
                 const thumbnail_bytes = await fetch(url, { method: "GET", headers: {} })
-                //console.log(await thumbnail_bytes.body.getReader().read())
+
                 const thumbnail_blob = thumbnail_bytes.blob().then(blob => {
                     const thumbnailUrl = URL.createObjectURL(blob)
 
-                    const thumbnailEl: HTMLImageElement = document.querySelector('#thumbnail-' + videos[i].key);
+                    const thumbnailEl: HTMLImageElement = document.querySelector('#thumbnail-' + this.splitVideoKey(videos[i].key));
                     thumbnailEl.src = thumbnailUrl
-                    console.log(blob)
                 })
             }
         },
         async deleteVideo(key: String) {
-            console.log(key);
             const url = await this.axios.delete("/api/video?key=" + key).then(response => response.data);
-            console.log(url);
 
             await fetch(url, {
                 method: "DELETE",

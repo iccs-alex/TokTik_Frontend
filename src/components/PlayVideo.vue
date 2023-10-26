@@ -6,9 +6,17 @@
       <div class="d-flex flex-column justify-space-between mb-12 ">
         {{ $route.params.key }}
         <v-card variant="elevated" color="secondary" class="mb-10">
-          <video ref="videoPlayer" controls>
-            <source type="video/mp4" :src="video" />
-          </video>
+            <video 
+                ref="videoPlayer"
+                width="500"
+                height="300"
+                class="video-js vjs-default-skin"
+                preload="auto"
+                :poster="'https://toktik-videos.s3.ap-southeast-1.amazonaws.com/thumbnail/' + $route.params.key"
+                controls
+                data-setup="{}">
+                <source type="application/x-mpegURL" :src="'https://toktik-videos.s3.ap-southeast-1.amazonaws.com/chunked_videos/' + $route.params.key + '/playlist.m3u8'" />
+            </video>
         </v-card>
       </div>
     </v-responsive>
@@ -19,25 +27,17 @@
 import Vue from "vue";
 import axios from "axios";
 import { ref } from 'vue';
-import videojs from "video.js";
-import "videojs-contrib-hls";
+import videojs from 'video.js';
+import 'video.js/dist/video-js.css'; // Import the CSS file
+import '@/css/videoPlayer.css'
 
 export default {
   mounted() {
-    // Initialize the video player
-    this.player = videojs(this.$refs.videoPlayer, {
-      techOrder: ["html5"],
-      html5: {
-        hls: {
-          withCredentials: false, // Set to true if needed
-        },
-      },
-    });
+   const videoElement = this.$refs.videoPlayer as Element;
 
-    // Set the source to your HLS playlist URL in S3
-    this.player.src({
-      type: "application/x-mpegURL",
-      src: "https://toktik-videos.s3.ap-southeast-1.amazonaws.com/chunked_videos/" + this.$route.params.key + "/linker.txt",
+    // Initialize the video player
+    this.player = videojs(videoElement, {
+      autoplay:false,
     });
 
     // Play the video
@@ -50,9 +50,11 @@ export default {
     }
   },
   data() {
-    let video = null;
+    let video = null
+    const player: any = null
     return {
       video,
+      player
     }
   },
   methods: {
