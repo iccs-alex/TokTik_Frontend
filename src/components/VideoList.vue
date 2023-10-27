@@ -5,7 +5,7 @@
 
             <div class="py-6" />
             <v-btn prepend-icon="mdi-refresh" @click="getVideos">Refresh</v-btn>
-            <div class="d-flex flex-column justify-space-between mb-12 ">
+            <div class="d-flex flex-column justify-space-between mb-12 mt-12 ">
                 <div v-for="video in videos">
                     <v-card variant="elevated" color="secondary" class="mb-10">
                         <template v-if="video.status == 1">
@@ -16,7 +16,6 @@
                                 <div>
                                     <v-card-title class="">{{ video.title }}</v-card-title>
                                     <v-card-text>{{ video.description }}</v-card-text>
-                                    <v-card-text>{{ (video.key) }}</v-card-text>
                                 </div>
                             </div>
                             <v-card-actions>
@@ -25,15 +24,17 @@
                             </v-card-actions>
                         </template>
                         <template v-else>
-                            <div class="d-flex flex-no-wrap">
-                                <div>
-                                    <v-card-title class="">{{ video.title }}</v-card-title>
-                                    <v-card-text>{{ video.description }}</v-card-text>
-                                    <v-card-text>{{ video.key }}</v-card-text>
-                                    <v-card-text>{{ video.status }}</v-card-text>
-                                </div>
-                                <div>
-                                    Processing...
+                            <div class="d-flex flex-column flex-no-wrap">
+                                <v-progress-linear indeterminate color="primary" />
+                                <div class="d-flex">
+                                    <div>
+                                        <v-card-title class="">{{ video.title }}</v-card-title>
+                                        <v-card-text>{{ video.description }}</v-card-text>
+                                    </div>
+                                    <div class="d-flex flex-grow-1 flex-column align-center justify-center">
+                                        <h4>The video has not finished processing.</h4>
+                                        <h4>Refresh in a few seconds.</h4>
+                                    </div>
                                 </div>
                             </div>
                         </template>
@@ -52,7 +53,8 @@ import { ref } from 'vue';
 
 export default {
     data() {
-        let videos = ref([])
+        //let videos = ref([])
+        let videos = ref([{key: 'test', title:'test', description:'test', status:0}])
         let thumbnail = ref("https://news.artnet.com/app/news-upload/2019/01/Cat-Photog-Feat-256x256.jpg")
         return {
             videos,
