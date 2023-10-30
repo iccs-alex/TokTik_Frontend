@@ -4,7 +4,7 @@
             <h3 class="text-h4 font-weight-bold">Videos</h3>
 
             <div class="py-6" />
-            <v-btn prepend-icon="mdi-refresh" @click="getVideos">Refresh</v-btn>
+            <v-btn :loading="loading" prepend-icon="mdi-refresh" @click="getVideos">Refresh</v-btn>
             <div class="d-flex flex-column justify-space-between mb-12 mt-12 ">
                 <div v-for="video in videos">
                     <v-card variant="elevated" color="secondary" class="mb-10">
@@ -32,7 +32,7 @@
                                         <v-card-text>{{ video.description }}</v-card-text>
                                     </div>
                                     <div class="d-flex flex-grow-1 flex-column align-center justify-center">
-                                        <h4>The video has not finished processing.</h4>
+                                        <h4>The video is {{video.workerStatus.statusMessage}}.</h4>
                                         <h4>Refresh in a few seconds.</h4>
                                     </div>
                                 </div>
@@ -53,16 +53,18 @@ import { ref } from 'vue';
 
 export default {
     data() {
-        //let videos = ref([])
-        let videos = ref([{key: 'test', title:'test', description:'test', status:0}])
-        let thumbnail = ref("https://news.artnet.com/app/news-upload/2019/01/Cat-Photog-Feat-256x256.jpg")
+        let videos = ref([])
+        //let videos = ref([{key: 'test', title:'test', description:'test', status:0}])
+        let thumbnail = ref("")
         return {
             videos,
             thumbnail,
+            loading: false
         }
     },
     methods: {
         async getVideos() {
+            this.loading = true
             let videos = await this.axios.get("/api/videos").then(response => response.data);
             this.videos = ref(videos)
             for (let i = 0; i < videos.length; i++) {
@@ -73,6 +75,12 @@ export default {
                     console.log("404 " + response.status)
                     videos[i]["status"] = 0
                     console.log(videos[i].status)
+                    
+                    // Get worker status from backend
+                    const workerStatus = await this.axios.get("/api/worker_status").then(response => response.data)
+                    videos[i]["workerStatus"] = workerStatus
+                    console.log(workerStatus)
+
                     continue
                 } else {
                     console.log("200 " + response.status)
@@ -91,6 +99,7 @@ export default {
                     thumbnailEl.src = thumbnailUrl
                 })
             }
+            this.loading = false
         },
         async deleteVideo(key: string) {
             const url = await this.axios.delete("/api/video?key=" + key).then(response => response.data);

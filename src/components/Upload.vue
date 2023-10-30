@@ -37,12 +37,12 @@
         <v-col cols="auto">
           <v-btn min-width="164" rel="noopener noreferrer" target="_blank" variant="text" @click="getVideo">
             <v-icon icon="mdi-cancel" size="large" start />
-            Cancel
+            Clear
           </v-btn>
         </v-col>
 
         <v-col cols="auto">
-          <v-btn color="primary" min-width="228" rel="noopener noreferrer" size="x-large" target="_blank" variant="flat"
+          <v-btn :loading="loading" color="primary" min-width="228" rel="noopener noreferrer" size="x-large" target="_blank" variant="flat"
             @click="upload">
             <v-icon icon="mdi-upload" size="large" start />
 
@@ -66,6 +66,7 @@ export default {
       file: null,
       errors: [],
       key: "",
+      loading: false
     }
   },
   methods: {
@@ -88,9 +89,13 @@ export default {
       const videoInput: HTMLInputElement = document.querySelector('#videoInput');
       if (videoInput == null) return;
 
+      this.loading = true
+    
       const videoFile = videoInput.files[0];
-      if (videoFile == null) return;
-
+      if (videoFile == null) {
+        this.loading = false
+        return;
+      }
       const url = await this.getPresignedUrl("PUT");
 
       // Sends request to upload the video
@@ -105,7 +110,7 @@ export default {
 
       //Sends request to start the conversion/thumbnail/chunking process
       const res = this.axios.post("/api/publish", { videoKey: this.key }).then(response => response.data);
-
+      this.loading = false
     },
     async getVideo() {
       const url = await this.getPresignedUrl("GET");
