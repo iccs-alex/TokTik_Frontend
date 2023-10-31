@@ -15,7 +15,12 @@
                 label="Password"
                 required
               ></v-text-field>
-
+              <v-text-field
+                v-model="confirm_password"
+                :rules="passwordRules"
+                label="Confirm Password"
+                required
+              ></v-text-field>
               <div class="d-flex flex-column">
                 <v-btn
                   :disable="!valid"
@@ -36,9 +41,6 @@
                 </v-btn>
               </div>
             </v-form>
-            <div class="mt-2">
-                <p class="text-body-2">Don't have an account? <a style="cursor: pointer" @click="$router.push('/Register')">Sign Up</a></p>
-            </div>
           </v-sheet>
     </v-responsive>
   </v-container>
@@ -50,8 +52,8 @@ import axios from "axios";
 export default {
   data: () => ({
     valid: true,
-    username: "blue",
-    password: "shad",
+    username: "",
+    password: "",
     usernameRules: [(v: boolean) => !!v || "Username is required"],
     passwordRules: [(v: boolean) => !!v || "Password is required"],
   }),

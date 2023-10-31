@@ -33,13 +33,12 @@ const routes = [
   {
     path: '/login',
     component: () => import('@/views/Login.vue'),
-    children: [
-      {
-        path: '',
-        name: 'Login',
-        component: () => import('@/views/Login.vue'),
-      }
-    ]
+    children: []
+  },
+  {
+    path: '/register',
+    component: () => import('@/views/Register.vue'),
+    children: []
   },
   { path: '/:pathMatch(.*)*', name: 'NotFound', component: () => import('@/views/NotFound.vue'), children: [] },
 ]
