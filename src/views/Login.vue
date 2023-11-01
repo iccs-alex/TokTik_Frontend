@@ -22,6 +22,7 @@
                   color="primary"
                   class="mt-4"
                   @click="submit"
+                  :loading="loading"
                 >
                   Log in
                 </v-btn>
@@ -46,6 +47,8 @@
 
 <script lang='ts'>
 import axios from "axios";
+import { useAppStore } from '@/store/app'
+const store = useAppStore()
 
 export default {
   data: () => ({
@@ -54,22 +57,35 @@ export default {
     password: "shad",
     usernameRules: [(v: boolean) => !!v || "Username is required"],
     passwordRules: [(v: boolean) => !!v || "Password is required"],
+    loading: false
   }),
 
   methods: {
     async submit() {
+      this.loading = true
       if ((this.$refs.form as any).validate()) {
+
         // submit to backend to authenticate
-        let formData = new FormData()
-        formData.append("username", this.username);
-        formData.append("password", this.password);
+        console.log("A")
+        let response = await axios.post("/api/auth/login", {"username": this.username, "password": this.password});
+        console.log(response)
+        if (response.status === 200) {
+          store.isLoggedIn = true
+          localStorage.setItem("jwt", response.data.token)
+          console.log("A")
 
-        let response = await axios.post("/api/login", formData);
-
-        if (response.data.success) {
           await this.$router.push({ path: "/" });
+        } else {
+          console.log("A")
+
+          alert("Invalid login")
         }
+        console.log("A")
+
       }
+      console.log("A")
+
+      this.loading = false
     },
     reset() {
       (this.$refs.form as any).reset();

@@ -27,8 +27,9 @@
                   color="primary"
                   class="mt-4"
                   @click="submit"
+                  :loading="loading"
                 >
-                  Log in
+                  Sign in
                 </v-btn>
 
                 <v-btn
@@ -41,6 +42,9 @@
                 </v-btn>
               </div>
             </v-form>
+            <div class="mt-2">
+                <p class="text-body-2">Already have an account? <a style="cursor: pointer" @click="$router.push('/Login')">Log in</a></p>
+            </div>
           </v-sheet>
     </v-responsive>
   </v-container>
@@ -48,30 +52,46 @@
 
 <script lang='ts'>
 import axios from "axios";
+import { useAppStore } from '@/store/app'
 
+const store = useAppStore()
 export default {
   data: () => ({
     valid: true,
     username: "",
     password: "",
+    confirm_password: "",
     usernameRules: [(v: boolean) => !!v || "Username is required"],
     passwordRules: [(v: boolean) => !!v || "Password is required"],
+    loading: false
   }),
-
+  computed: {
+    confirmPasswordRules() {
+      if(this.password === this.confirm_password)
+        return true
+      else {
+        return "Passwords must match"
+      }
+    }
+  },
   methods: {
     async submit() {
+      this.loading = true
       if ((this.$refs.form as any).validate()) {
-        // submit to backend to authenticate
-        let formData = new FormData()
-        formData.append("username", this.username);
-        formData.append("password", this.password);
 
-        let response = await axios.post("/api/login", formData);
+        // submit to backend
+        let response = await axios.post("/api/auth/register", {"username": this.username, "password": this.password});
+        console.log(response)
 
-        if (response.data.success) {
+        if (response.status === 200) {
+          store.isLoggedIn = true
+          localStorage.setItem("jwt", response.data.token)
           await this.$router.push({ path: "/" });
+        } else {
+          alert("Registration failed")
         }
       }
+      this.loading = false
     },
     reset() {
       (this.$refs.form as any).reset();

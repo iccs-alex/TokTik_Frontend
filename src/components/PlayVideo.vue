@@ -52,13 +52,14 @@ export default {
     const player: any = null
     return {
       video,
-      player
+      player,
+      token: localStorage.getItem("jwt")
     }
   },
   methods: {
     async getVideo(key: String) {
 
-      const url = await this.axios.get("/api/video?key=" + this.$route.params.key).then(response => response.data)
+      const url = await this.axios.get("/api/video?key=" + this.$route.params.key, {headers: {'Authorization': 'Bearer ' + this.token}}).then(response => response.data)
 
       const video_ = await fetch(url, {
         method: "GET",

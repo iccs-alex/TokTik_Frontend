@@ -1,10 +1,15 @@
 // Composables
 import { createRouter, createWebHistory } from 'vue-router'
+import { mainModule } from 'process'
+import { useAppStore } from '@/store/app'
 
 const routes = [
   {
     path: '/',
     component: () => import('@/layouts/default/Default.vue'),
+    meta: {
+      requiresAuth: true
+    },
     children: [
       {
         path: '',
@@ -32,6 +37,7 @@ const routes = [
   },
   {
     path: '/login',
+    name: 'Login',
     component: () => import('@/views/Login.vue'),
     children: []
   },
@@ -46,6 +52,20 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(),
   routes,
+})
+
+router.beforeEach((to, from, next) => {
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    // this route requires auth, check if logged in
+    // if not, redirect to login page.
+    if (!useAppStore().isLoggedIn) {
+      next({ name: 'Login' })
+    } else {
+      next() // go to wherever I'm going
+    }
+  } else {
+    next() // does not require auth, make sure to always call next()!
+  }
 })
 
 export default router

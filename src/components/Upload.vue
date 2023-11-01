@@ -66,7 +66,8 @@ export default {
       file: null,
       errors: [],
       key: "",
-      loading: false
+      loading: false,
+      token: localStorage.getItem("jwt")
     }
   },
   methods: {
@@ -78,10 +79,10 @@ export default {
       if (method === "PUT") {
         const key: string = crypto({ length: 16 });
         this.key = key;
-        return this.axios.put("/api/video", { key: key, title: title, description: description }).then(response => response.data);
+        return this.axios.put("/api/video", { key: key, title: title, description: description }, {headers: {'Authorization': 'Bearer ' + this.token}}).then(response => response.data);
       }
       else if (method === "GET") {
-        return this.axios.get("/api/video?key=" + 'videos/' + title).then(response => response.data);
+        return this.axios.get("/api/video?key=" + 'videos/' + title, {headers: {'Authorization': 'Bearer ' + this.token}}).then(response => response.data);
       }
     },
     async upload() {
@@ -109,7 +110,7 @@ export default {
       })
 
       //Sends request to start the conversion/thumbnail/chunking process
-      const res = this.axios.post("/api/publish", { videoKey: this.key }).then(response => response.data);
+      const res = this.axios.post("/api/publish", { videoKey: this.key }, {headers: {'Authorization': 'Bearer ' + this.token}}).then(response => response.data);
       this.loading = false
     },
     async getVideo() {
