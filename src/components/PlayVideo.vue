@@ -3,7 +3,6 @@
     <v-responsive class="px-4 py-4 fill-height">
       <div class="py-6" />
       <v-btn prepend-icon="mdi-refresh" @click="getVideo">Refresh</v-btn>
-      {{ $route.params.key }}
       <div class="d-flex mb-12 justify-center">
             <video 
                 ref="videoPlayer"
@@ -14,7 +13,7 @@
                 :poster="'https://toktik-videos.s3.ap-southeast-1.amazonaws.com/thumbnail/' + $route.params.key"
                 controls
                 data-setup="{}">
-                <source type="application/x-mpegURL" :src="'https://toktik-videos.s3.ap-southeast-1.amazonaws.com/chunked_videos/' + $route.params.key + '/playlist.m3u8'" />
+                <source type="application/x-mpegURL" :src="playlist" />
             </video>
       </div>
     </v-responsive>
@@ -38,6 +37,8 @@ export default {
       autoplay:false,
     });
 
+    this.getThumbnail()
+    this.getVideo()
     // Play the video
     this.player.play();
   },
@@ -53,28 +54,34 @@ export default {
     return {
       video,
       player,
-      token: localStorage.getItem("jwt")
+      token: localStorage.getItem("jwt"),
+      playlist: '',
+      thumbnail: ''
     }
   },
   methods: {
-    async getVideo(key: String) {
+    async getVideo() {
 
-      const url = await this.axios.get("/api/video?key=" + this.$route.params.key, {headers: {'Authorization': 'Bearer ' + this.token}}).then(response => response.data)
+      const url = await this.axios.get("/api/video?key=chunked_videos/" + this.$route.params.key + "/playlist.m3u8", {headers: {'Authorization': 'Bearer ' + this.token}}).then(response => response.data)
 
-      const video_ = await fetch(url, {
-        method: "GET",
-        headers: {},
-      });
-      console.log(video_)
-      const blob = video_.blob().then(blob => {
-        console.log(blob)
-        const videoUrl = URL.createObjectURL(blob)
-        const videoPlayer: HTMLVideoElement = document.querySelector('#videoId');
-        videoPlayer.src = videoUrl
-        videoPlayer.play()
-        console.log(blob)
-      })
-      return video_.body;
+      this.playlist = url
+      const videoPlayer: HTMLVideoElement = document.querySelector('#videoId');
+      videoPlayer.play()
+    },
+    async getThumbnail() {
+    const url = await this.axios.get("/api/video?key=thumbnail/" + this.$route.params.key, {headers: {'Authorization': 'Bearer ' + this.token}}).then(response => response.data)
+
+    const thumbnail_ = await fetch(url, {
+      method: "GET",
+      headers: {},
+    });
+
+    const blob = thumbnail_.blob().then(blob => {
+      console.log(blob)
+      const thumbnailUrl = URL.createObjectURL(blob)
+      this.thumbnail = thumbnailUrl
+    })
+    return thumbnail_.body;
     }
   },
 }
