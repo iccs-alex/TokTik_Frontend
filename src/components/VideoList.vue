@@ -73,20 +73,16 @@ export default {
                 const playlist_url = await this.axios.get("/api/video?key=chunked_videos/" + videos[i].key + "/playlist.m3u8", {headers: {'Authorization': 'Bearer ' + this.token}}).then(response => response.data)
                 const response = await fetch(playlist_url, { method: "GET", headers: {} })
                 if(response.status == 404) {
-                    console.log("404 " + response.status)
-                    videos[i]["status"] = 0
-                    console.log(videos[i].status)
-                    
+                    videos[i]["status"] = 0    
+
                     // Get worker status from backend
                     const workerStatus = await this.axios.get("/api/worker_status", {headers: {'Authorization': 'Bearer ' + this.token}}).then(response => response.data)
                     videos[i]["workerStatus"] = workerStatus
                     console.log(workerStatus)
-
                     continue
                 } else {
-                    console.log("200 " + response.status)
                     videos[i]["status"] = 1
-                    console.log(videos[i].status)
+                    videos[i]["workerStatus"] = {workerStatus: {workerStatus: {statusMessage: ''}}}
                 }
                 this.videos = ref(videos)
 
