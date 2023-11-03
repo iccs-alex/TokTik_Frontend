@@ -11,15 +11,21 @@
                 ></v-text-field>
               <v-text-field
                 v-model="password"
+                :append-inner-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'"
+                :type="show1 ? 'text' : 'password'"
                 :rules="passwordRules"
                 label="Password"
+                @click:append-inner="show1 = !show1"
                 required
               ></v-text-field>
               <v-text-field
                 v-model="confirm_password"
+                :append-inner-icon="show2 ? 'mdi-eye' : 'mdi-eye-off'"
+                :type="show2 ? 'text' : 'password'"
                 :rules="passwordRules"
-                label="Confirm Password"
+                @click:append-inner="show2 = !show2"
                 required
+                label="Confirm Password"
               ></v-text-field>
               <div class="d-flex flex-column">
                 <v-btn
@@ -63,7 +69,9 @@ export default {
     confirm_password: "",
     usernameRules: [(v: boolean) => !!v || "Username is required"],
     passwordRules: [(v: boolean) => !!v || "Password is required"],
-    loading: false
+    loading: false,
+    show1: false,
+    show2: false
   }),
   computed: {
     confirmPasswordRules() {

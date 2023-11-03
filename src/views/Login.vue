@@ -11,8 +11,11 @@
                 ></v-text-field>
               <v-text-field
                 v-model="password"
+                :append-inner-icon="show ? 'mdi-eye' : 'mdi-eye-off'"
+                :type="show ? 'text' : 'password'"
                 :rules="passwordRules"
                 label="Password"
+                @click:append-inner="show = !show"
                 required
               ></v-text-field>
 
@@ -57,34 +60,25 @@ export default {
     password: "shad",
     usernameRules: [(v: boolean) => !!v || "Username is required"],
     passwordRules: [(v: boolean) => !!v || "Password is required"],
-    loading: false
+    loading: false,
+    show: false
   }),
 
   methods: {
     async submit() {
       this.loading = true
       if ((this.$refs.form as any).validate()) {
-
         // submit to backend to authenticate
-        console.log("A")
         let response = await axios.post("/api/auth/login", {"username": this.username, "password": this.password});
         console.log(response)
         if (response.status === 200) {
           store.isLoggedIn = true
           localStorage.setItem("jwt", response.data.token)
-          console.log("A")
-
           await this.$router.push({ path: "/" });
         } else {
-          console.log("A")
-
           alert("Invalid login")
         }
-        console.log("A")
-
       }
-      console.log("A")
-
       this.loading = false
     },
     reset() {
