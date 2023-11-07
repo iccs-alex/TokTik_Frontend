@@ -69,8 +69,15 @@ export default {
       this.loading = true
       if ((this.$refs.form as any).validate()) {
         // submit to backend to authenticate
-        let response = await axios.post("/api/auth/login", {"username": this.username, "password": this.password});
-        console.log(response)
+        let response;
+        try {
+          response = await axios.post("/api/auth/login", {"username": this.username, "password": this.password});
+        }
+        catch(e) {
+          console.log(response)
+          this.loading = false
+          alert("Invalid username or password.")
+        }
         if (response.status === 200) {
           store.isLoggedIn = true
           localStorage.setItem("jwt", response.data.token)

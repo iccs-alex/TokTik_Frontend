@@ -17,7 +17,7 @@
               <v-list-item
                 v-for="(item, i) in items"
                 :key="i"
-                @click="logout"
+                @click="item.event"
               >
                 <v-list-item-title>{{ item.title }}</v-list-item-title>
               </v-list-item>
@@ -36,9 +36,15 @@
   export default {
   data: () => ({
     isLoggedIn: false,
-    items: [{title: "Log out"}]
+    items: []
+  }),
+  created: () => ({
   }),
   mounted() {
+    this.items = [
+      {title: "View Profile", event: this.viewProfile},
+      {title: "Log out", event: this.logout}
+    ]
     this.syncLogin()
   },
   methods: {
@@ -55,6 +61,18 @@
         return
       }
       this.$router.push('/Login')
+    },
+    viewProfile() {
+      this.$router.push('/Profile/'+this.parseJwt(localStorage.getItem('jwt')).username)
+    },
+    parseJwt(token) {
+      var base64Url = token.split('.')[1];
+      var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+      }).join(''));
+      console.log(JSON.parse(jsonPayload))
+      return JSON.parse(jsonPayload);
     }
   },
 }

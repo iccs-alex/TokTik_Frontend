@@ -88,8 +88,14 @@ export default {
       if ((this.$refs.form as any).validate()) {
 
         // submit to backend
-        let response = await axios.post("/api/auth/register", {"username": this.username, "password": this.password});
-        console.log(response)
+        let response;
+        try {
+          response = await axios.post("/api/auth/register", {"username": this.username, "password": this.password});
+        } catch(e) {
+          console.log(response)
+          this.loading = false
+          alert("There was an issue. The username might be taken.")
+        }
 
         if (response.status === 200) {
           store.isLoggedIn = true
