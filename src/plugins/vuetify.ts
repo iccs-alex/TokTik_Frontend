@@ -17,10 +17,20 @@ export default createVuetify({
     themes: {
       light: {
         colors: {
-          primary: '#1867C0',
-          secondary: '#5CBBF6',
+          primary: '#000000',
+          secondary: '#FFFFFF',
+          tiktokBlue: '#00f2ea',
+          tiktokRed: '#ff0050',
         },
       },
+      dark: {
+        colors: {
+          primary: '#FFFFFF',
+          secondary: '#000000',
+          tiktokBlue: '#00f2ea',
+          tiktokRed: '#ff0050',
+        }
+      }
     },
   },
 })

@@ -20,7 +20,7 @@
 
         <v-col class="d-flex flex-column justify-space-between" style="margin-top: 30px">
           <v-row class="d-flex flex-column">
-            <v-card color="secondary" min-height="260" variant="outlined">
+            <v-card min-height="260" variant="outlined">
               <div class="h-100 w-100 d-flex flex-column align-center justify-center">
                 <input @change="inputFileChange" id="videoInput" type="file" accept="video/*">
               </div>
@@ -35,17 +35,9 @@
 
       <v-row class="d-flex align-center justify-end">
         <v-col cols="auto">
-          <v-btn min-width="164" rel="noopener noreferrer" target="_blank" variant="text" @click="getVideo">
-            <v-icon icon="mdi-cancel" size="large" start />
-            Clear
-          </v-btn>
-        </v-col>
-
-        <v-col cols="auto">
-          <v-btn :loading="loading" color="primary" min-width="228" rel="noopener noreferrer" size="x-large" target="_blank" variant="flat"
+          <v-btn :loading="loading" color="tiktokRed" min-width="228" rel="noopener noreferrer" size="x-large" target="_blank" variant="flat"
             @click="upload">
             <v-icon icon="mdi-upload" size="large" start />
-
             Upload
           </v-btn>
         </v-col>

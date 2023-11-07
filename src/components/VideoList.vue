@@ -25,7 +25,7 @@
                         </template>
                         <template v-else>
                             <div class="d-flex flex-column flex-no-wrap">
-                                <v-progress-linear indeterminate color="primary" />
+                                <v-progress-linear indeterminate color="tiktokBlue" />
                                 <div class="d-flex">
                                     <div>
                                         <v-card-title class="">{{ video.title }}</v-card-title>
@@ -53,8 +53,8 @@ import { ref } from 'vue';
 
 export default {
     data() {
-        let videos = ref([])
-        //let videos = ref([{key: 'test', title:'test', description:'test', status:0}])
+        //let videos = ref([])
+        let videos = ref([{key: 'test', title:'test', description:'test', status:0, workerStatus:{statusMessage: 'asd'}}])
         let thumbnail = ref("")
         return {
             videos,
@@ -66,36 +66,41 @@ export default {
     methods: {
         async getVideos() {
             this.loading = true
-            let videos = await this.axios.get("/api/videos", {headers: {'Authorization': 'Bearer ' + this.token}}).then(response => response.data);
-            this.videos = ref(videos)
-            for (let i = 0; i < videos.length; i++) {
-                console.log(videos[i])
-                const playlist_url = await this.axios.get("/api/video?key=chunked_videos/" + videos[i].key + "/playlist.m3u8", {headers: {'Authorization': 'Bearer ' + this.token}}).then(response => response.data)
-                const response = await fetch(playlist_url, { method: "GET", headers: {} })
-                if(response.status == 404) {
-                    videos[i]["status"] = 0    
 
-                    // Get worker status from backend
-                    const workerStatus = await this.axios.get("/api/worker_status", {headers: {'Authorization': 'Bearer ' + this.token}}).then(response => response.data)
-                    videos[i]["workerStatus"] = workerStatus
-                    console.log(workerStatus)
-                    continue
-                } else {
-                    videos[i]["status"] = 1
-                    videos[i]["workerStatus"] = {workerStatus: {workerStatus: {statusMessage: ''}}}
-                }
+            try {
+                let videos = await this.axios.get("/api/videos", {headers: {'Authorization': 'Bearer ' + this.token}}).then(response => response.data);
                 this.videos = ref(videos)
+                for (let i = 0; i < videos.length; i++) {
+                    const playlist_url = await this.axios.get("/api/video?key=chunked_videos/" + videos[i].key + "/playlist.m3u8", {headers: {'Authorization': 'Bearer ' + this.token}}).then(response => response.data)
+                    const response = await fetch(playlist_url, { method: "GET", headers: {} })
+                    if(response.status == 404) {
+                        videos[i]["status"] = 0    
 
-                const thumbnail_url = await this.axios.get("/api/video?key=thumbnail/" + videos[i].key, {headers: {'Authorization': 'Bearer ' + this.token}}).then(response => response.data)
-                const thumbnail_bytes = await fetch(thumbnail_url, { method: "GET", headers: {} })
+                        // Get worker status from backend
+                        const workerStatus = await this.axios.get("/api/worker_status", {headers: {'Authorization': 'Bearer ' + this.token}}).then(response => response.data)
+                        videos[i]["workerStatus"] = workerStatus
+                        continue
+                    } else {
+                        videos[i]["status"] = 1
+                        videos[i]["workerStatus"] = {workerStatus: {workerStatus: {statusMessage: ''}}}
+                    }
+                    this.videos = ref(videos)
 
-                const thumbnail_blob = thumbnail_bytes.blob().then(blob => {
-                    const thumbnailUrl = URL.createObjectURL(blob)
+                    const thumbnail_url = await this.axios.get("/api/video?key=thumbnail/" + videos[i].key, {headers: {'Authorization': 'Bearer ' + this.token}}).then(response => response.data)
+                    const thumbnail_bytes = await fetch(thumbnail_url, { method: "GET", headers: {} })
 
-                    const thumbnailEl: HTMLImageElement = document.querySelector('#thumbnail-' + videos[i].key);
-                    thumbnailEl.src = thumbnailUrl
-                })
+                    const thumbnail_blob = thumbnail_bytes.blob().then(blob => {
+                        const thumbnailUrl = URL.createObjectURL(blob)
+
+                        const thumbnailEl: HTMLImageElement = document.querySelector('#thumbnail-' + videos[i].key);
+                        thumbnailEl.src = thumbnailUrl
+                    })
+                }
+            } catch(e) {
+                this.loading = false
+
             }
+
             this.loading = false
         },
         async deleteVideo(key: string) {

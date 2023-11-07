@@ -1,7 +1,12 @@
 <template>
-  <v-container>
-    <v-responsive class="px-4 py-4">
-          <v-sheet width="300" class="mx-auto h-100">
+  <v-container class="d-flex h-screen">
+    <v-responsive class="px-4 py-4 align-center justify-center">
+          <v-sheet width="400" class="ma-auto pa-5">
+            <v-container @click="$router.push('/')" style="cursor: pointer" class="text-center text-h5 mt-2 mb-5" :style="{color:$vuetify.theme.themes.dark.colors.tiktokBlue}">
+              <v-icon color="tiktokRed" icon="mdi-music-circle-outline" />
+              TokTik
+            </v-container>
+
             <v-form ref="form">
               <v-text-field
                 v-model="username"
@@ -22,7 +27,7 @@
               <div class="d-flex flex-column">
                 <v-btn
                   :disable="!valid"
-                  color="primary"
+                  color="tiktokBlue"
                   class="mt-4"
                   @click="submit"
                   :loading="loading"
@@ -31,7 +36,7 @@
                 </v-btn>
 
                 <v-btn
-                  color="neutral"
+                  color="primary"
                   class="mt-4"
                   block
                   @click="reset"
@@ -41,7 +46,7 @@
               </div>
             </v-form>
             <div class="mt-2">
-                <p class="text-body-2">Don't have an account? <a style="cursor: pointer" @click="$router.push('/Register')">Sign Up</a></p>
+                <p class="text-body-2">Don't have an account? <a :style="{cursor: 'pointer',color:$vuetify.theme.themes.dark.colors.tiktokRed}" @click="$router.push('/Register')">Sign Up</a></p>
             </div>
           </v-sheet>
     </v-responsive>

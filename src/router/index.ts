@@ -7,9 +7,6 @@ const routes = [
   {
     path: '/',
     component: () => import('@/layouts/default/Default.vue'),
-    meta: {
-      requiresAuth: true
-    },
     children: [
       {
         path: '',
@@ -20,22 +17,23 @@ const routes = [
         path: 'upload',
         name: 'Upload',
         component: () => import('@/components/Upload.vue'),
-      },
-      {
-        path: 'videolist',
-        name: 'VideoList',
-        component: () => import('@/components/VideoList.vue'),
-
+        meta: {
+          requiresAuth: true
+        },
       },
       {
         path: 'PlayVideo/:key',
         name: 'PlayVideo',
         component: () => import('@/components/PlayVideo.vue'),
+        
       },
       {
         path: 'Profile/:userId',
         name: 'Profile',
         component: () => import('@/components/Profile.vue'),
+        meta: {
+          requiresAuth: true
+        },
       },
 
     ],
