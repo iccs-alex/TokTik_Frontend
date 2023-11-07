@@ -5,18 +5,16 @@
 
             <div class="py-6" />
             <v-btn :loading="loading" prepend-icon="mdi-refresh" @click="getVideos">Refresh</v-btn>
-            <div class="d-flex flex-column justify-space-between mb-12 mt-12 ">
+            <div class="d-flex justify-space-between mb-12 mt-12 ">
                 <div v-for="video in videos">
+
                     <v-card variant="elevated" color="secondary" class="mb-10">
                         <template v-if="video.status == 1">
-                            <div class="d-flex flex-no-wrap">
-                                <v-avatar class="ma-3" size="200" rounded="0">
-                                    <img :id="'thumbnail-' + video.key" :src="thumbnail">
-                                </v-avatar>
-                                <div>
-                                    <v-card-title class="">{{ video.title }}</v-card-title>
-                                    <v-card-text>{{ video.description }}</v-card-text>
-                                </div>
+                            <div class="flex-column">
+                                <v-card-title class="">{{ video.title }}</v-card-title>
+                                <v-card-text>{{ video.description }}</v-card-text>
+                                <!-- <img :id="'thumbnail-' + video.key" :src="thumbnail"> -->
+                                <v-img :width="300" aspect-ratio="16/9" cover :id="'thumbnail-' + video.key" src="@/assets/logo.png"></v-img>
                             </div>
                             <v-card-actions>
                                 <v-btn @click="playVideo(video.key)" variant="tonal" icon="mdi-play"></v-btn>
@@ -26,7 +24,7 @@
                         <template v-else>
                             <div class="d-flex flex-column flex-no-wrap">
                                 <v-progress-linear indeterminate color="tiktokBlue" />
-                                <div class="d-flex">
+                                <div class="d-flex pa-5">
                                     <div>
                                         <v-card-title class="">{{ video.title }}</v-card-title>
                                         <v-card-text>{{ video.description }}</v-card-text>
@@ -39,6 +37,7 @@
                             </div>
                         </template>
                     </v-card>
+
                 </div>
             </div>
         </v-responsive>
@@ -54,7 +53,7 @@ import { ref } from 'vue';
 export default {
     data() {
         //let videos = ref([])
-        let videos = ref([{key: 'test', title:'test', description:'test', status:0, workerStatus:{statusMessage: 'asd'}}])
+        let videos = ref([{key: 'test', title:'test', description:'test', status:1, workerStatus:{statusMessage: 'asd'}}])
         let thumbnail = ref("")
         return {
             videos,
