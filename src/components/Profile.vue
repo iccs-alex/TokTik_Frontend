@@ -8,19 +8,25 @@
             <div class="d-flex justify-space-between mb-12 mt-12 ">
                 <div v-for="video in videos">
 
-                    <v-card style="background-color:transparent" variant="flat" class="mb-10">
+                    <v-card @click="playVideo(video.key)" style="background-color:transparent" variant="elevated"
+                        class="mb-10">
                         <template v-if="video.status == 1">
                             <div class="flex-column">
                                 <v-card-title class="">{{ video.title }}</v-card-title>
                                 <v-card-text>{{ video.description }}</v-card-text>
-                                <v-img class="image" :src="video.thumbnail" width="300" height="300" cover :id="'thumbnail'">
-
+                                <v-img class="image d-flex" :src="video.thumbnail" width="300" height="300" cover
+                                    :id="'thumbnail'">
+                                    <template v-slot:placeholder>
+                                        <div class="d-flex align-center justify-center fill-height">
+                                            <v-progress-circular color="grey-lighten-4" indeterminate></v-progress-circular>
+                                        </div>
+                                    </template>
+                                    asdasdasd
+                                    <v-card-actions class="align-self-end">
+                                        <v-btn @click="deleteVideo(video.key)" variant="tonal" icon="mdi-delete"></v-btn>
+                                    </v-card-actions>
                                 </v-img>
                             </div>
-                            <v-card-actions>
-                                <v-btn @click="playVideo(video.key)" variant="tonal" icon="mdi-play"></v-btn>
-                                <v-btn @click="deleteVideo(video.key)" variant="tonal" icon="mdi-delete"></v-btn>
-                            </v-card-actions>
                         </template>
                         <template v-else>
                             <div class="d-flex flex-column flex-no-wrap">
@@ -53,8 +59,8 @@ import { ref } from 'vue';
 
 export default {
     data() {
-        //let videos = ref([])
-        let videos = ref([{thumbnail:'https://images.unsplash.com/photo-1608848461950-0fe51dfc41cb?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8fA%3D%3D', key: 'test', title: 'test', description: 'test', status: 1, workerStatus: { statusMessage: 'asd' } }])
+        let videos = ref([])
+        //let videos = ref([{thumbnail:'https://images.unsplash.com/photo-1608848461950-0fe51dfc41cb?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8fA%3D%3D', key: 'test', title: 'test', description: 'test', status: 1, workerStatus: { statusMessage: 'asd' } }])
         return {
             videos,
             loading: false,
@@ -62,7 +68,7 @@ export default {
         }
     },
     mounted() {
-        //this.getVideos()
+        this.getVideos()
     },
     methods: {
         async getVideos() {
@@ -94,7 +100,7 @@ export default {
                 this.loading = false
                 alert("Server not alive.")
             }
-            console.log(this.videos);            
+            console.log(this.videos);
             this.loading = false
         },
         async deleteVideo(key: string) {

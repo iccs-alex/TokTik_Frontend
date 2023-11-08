@@ -2,7 +2,7 @@
   <div class="h-100 d-flex">
     <!-- Video Section -->
     <div style="width: 70%">
-      <video ref="videoPlayer" class="h-100 vjs-16-9 video-js vjs-default-skin videoPlayer" preload="auto" controls data-setup='{}'>
+      <video ref="videoPlayer" class="h-100 vjs-16-9 video-js vjs-default-skin videoPlayer" loop>
         <source type="application/x-mpegURL" />
       </video>
     </div>
@@ -17,11 +17,11 @@
 
       <v-card variant="outlined" class="pa-2 d-flex justify-center" style="gap:30px">
         <div class="d-flex" style="gap:10px">
-          <v-icon icon="mdi-heart"/>
+          <v-icon icon="mdi-heart" />
           <p>4</p>
         </div>
         <div class="d-flex" style="gap:10px">
-          <v-icon icon="mdi-message-processing-outline"/>
+          <v-icon icon="mdi-message-processing-outline" />
           <p>10</p>
         </div>
       </v-card>
@@ -56,51 +56,48 @@ export default {
   async mounted() {
     const videoElement = this.$refs.videoPlayer as Element;
 
-    // Initialize the video player
-    this.player = videojs(videoElement, {
-      autoplay: false,
-    });
-
-    const playlistFile = await this.getPlaylistFile()
-    //const playlistReader = await playlistFile.body.getReader().read().then((response) => response.value)
-
-    let playlistUrl = ''
-    await playlistFile.blob().then(blob => {
-      playlistUrl = URL.createObjectURL(blob)
+    const unsignedPlaylistFile = await this.getPlaylistFile()
+    let unsignedPlaylistUrl = ''
+    await unsignedPlaylistFile.blob().then(blob => {
+      unsignedPlaylistUrl = URL.createObjectURL(blob)
     })
 
-    let playlistBlob = new Blob([], {type: "text/plain"});
-    const playlist_ = await fetch(playlistUrl).then((res) => res.text()).then(async (text) => {
+    let playlistBlob = new Blob([], { type: "text/plain" });
+    const signedPlaylist = await fetch(unsignedPlaylistUrl).then((res) => res.text()).then(async (text) => {
       let lines = text.split('\n')
-      lines.forEach(async (line) => {
-        if(line.includes("chunks")) {
+      for (const line of lines) {
+        if (line.includes("chunks")) {
           const presignedChunk = await this.getPresignedChunk(line)
-          playlistBlob = new Blob([playlistBlob,presignedChunk+"\n"], {type: "text/plain"})
-          console.log(presignedChunk+"\n")
+          playlistBlob = new Blob([playlistBlob, presignedChunk + "\n"], { type: "text/plain" })
         }
         else {
-          playlistBlob = new Blob([playlistBlob,line+"\n"], {type: "text/plain"})
-          console.log(line+"\n")
+          playlistBlob = new Blob([playlistBlob, line + "\n"], { type: "text/plain" })
         }
-      })
+      }
       return playlistBlob
     })
-    console.log(await playlistBlob.text())
+    console.log(await signedPlaylist.text())
+    const signedPlaylistUrl = URL.createObjectURL(signedPlaylist)
 
-    playlistUrl = URL.createObjectURL(playlistBlob)
-    console.log(playlistUrl)
+    this.thumbnailUrl = await this.getThumbnailUrl()
 
-    this.getThumbnail()
-    this.playlistUrl = await this.getPlaylistUrl()
-    this.player.play()
+
+    // Initialize the video player
+    this.player = videojs(videoElement, {
+      autoplay: true,
+      userActions: {
+        doubleClick: false,
+      }
+    });
 
     this.player.src({
-      src: playlistUrl,
+      src: signedPlaylistUrl,
       type: 'application/x-mpegURL',
       withCredentials: false
     })
 
-    console.log(playlistUrl)
+    this.player.on('click', this.videoClickHandler)
+
     // Play the video
     this.player.play();
   },
@@ -111,10 +108,8 @@ export default {
     }
   },
   data() {
-    let video = null
     const player: any = null
     return {
-      video,
       player,
       token: localStorage.getItem("jwt"),
       playlistUrl: '',
@@ -122,24 +117,30 @@ export default {
     }
   },
   methods: {
+    videoClickHandler() {
+      if (this.player.paused()) {
+        this.player.play();
+      } else {
+        this.player.pause();
+      }
+    },
     async getPlaylistFile() {
       const url: string = await this.axios.get("/api/video?key=chunked_videos/" + this.$route.params.key + "/playlist.m3u8", { headers: { 'Authorization': 'Bearer ' + this.token } }).then(response => response.data)
-      const playlistFile = await fetch(url, {method: 'GET', headers: {}})
+      const playlistFile = await fetch(url, { method: 'GET', headers: {} })
       return playlistFile
     },
     async getPlaylistUrl() {
       return await this.axios.get("/api/video?key=chunked_videos/" + this.$route.params.key + "/playlist.m3u8", { headers: { 'Authorization': 'Bearer ' + this.token } }).then(response => response.data)
     },
-    async getPresignedChunk(chunkFile:string) {
-      return await this.axios.get("/api/video?key=chunked_videos/"+this.$route.params.key+"/"+chunkFile, { headers: { 'Authorization': 'Bearer ' + this.token } }).then(response => response.data)
+    async getPresignedChunk(chunkFile: string) {
+      return await this.axios.get("/api/video?key=chunked_videos/" + this.$route.params.key + "/" + chunkFile, { headers: { 'Authorization': 'Bearer ' + this.token } }).then(response => response.data)
     },
     async getS3Token() {
       const url: string = await this.axios.get("/api/video?key=chunked_videos/" + this.$route.params.key + "/playlist.m3u8", { headers: { 'Authorization': 'Bearer ' + this.token } }).then(response => response.data)
       return url.split('playlist.m3u8')[1]
     },
-    async getThumbnail() {
-      const url = await this.axios.get("/api/video?key=thumbnail/" + this.$route.params.key, { headers: { 'Authorization': 'Bearer ' + this.token } }).then(response => response.data)
-      this.thumbnailUrl = url
+    async getThumbnailUrl() {
+      return await this.axios.get("/api/video?key=thumbnail/" + this.$route.params.key, { headers: { 'Authorization': 'Bearer ' + this.token } }).then(response => response.data)
     }
   }
 
