@@ -10,7 +10,7 @@
       <v-btn @click="toggleTheme" class="mr-2" icon="mdi-theme-light-dark" />
       <v-btn @click="$router.push('/Upload')" class="mr-2" prepend-icon="mdi-plus">Upload</v-btn>
         <template v-if="isLoggedIn">
-          <v-menu>
+          <v-menu open-on-hover>
             <template v-slot:activator="{ props }">
               <v-btn icon="mdi-account" v-bind="props"></v-btn>
             </template>

@@ -1,10 +1,23 @@
 .vjs-default-skin .vjs-control-bar {
   background-color: #333;
 }
+
 .vjs-default-skin .vjs-play-progress {
-  background-color: #ff5722; /* Customize progress bar color */
+  background-color: #ff5722;
+  /* Customize progress bar color */
 }
 
 .videoPlayer {
-    border-radius: "20px";
+  border-radius: "20px";
+}
+
+.vjs-custom-waiting .vjs-loading-spinner {
+  display: block;
+}
+
+.video-js.vjs-custom-waiting .vjs-loading-spinner:before,
+.video-js.vjs-custom-waiting .vjs-loading-spinner:after {
+  /* I just copied the same animation as in the default css file */
+  -webkit-animation: vjs-spinner-spin 1.1s cubic-bezier(0.6, 0.2, 0, 0.8) infinite, vjs-spinner-fade 1.1s linear infinite;
+  animation: vjs-spinner-spin 1.1s cubic-bezier(0.6, 0.2, 0, 0.8) infinite, vjs-spinner-fade 1.1s linear infinite;
 }

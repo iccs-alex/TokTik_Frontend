@@ -1,7 +1,7 @@
 <template>
     <v-container class="fill-height">
         <v-responsive class="px-4 py-4 fill-height">
-            <h3 class="text-h4 font-weight-bold">Videos</h3>
+            <h3 class="text-h4 font-weight-bold">Your Videos</h3>
 
             <div class="py-6" />
             <v-btn :loading="loading" prepend-icon="mdi-refresh" @click="getVideos">Refresh</v-btn>
@@ -14,15 +14,14 @@
                             <div class="flex-column">
                                 <v-card-title class="">{{ video.title }}</v-card-title>
                                 <v-card-text>{{ video.description }}</v-card-text>
-                                <v-img class="image d-flex" :src="video.thumbnail" width="300" height="300" cover
+                                <v-img class="d-flex flex-column justify-end align-end" :src="video.thumbnail" width="300" height="300" cover
                                     :id="'thumbnail'">
                                     <template v-slot:placeholder>
                                         <div class="d-flex align-center justify-center fill-height">
                                             <v-progress-circular color="grey-lighten-4" indeterminate></v-progress-circular>
                                         </div>
                                     </template>
-                                    asdasdasd
-                                    <v-card-actions class="align-self-end">
+                                    <v-card-actions>
                                         <v-btn @click="deleteVideo(video.key)" variant="tonal" icon="mdi-delete"></v-btn>
                                     </v-card-actions>
                                 </v-img>
@@ -59,8 +58,8 @@ import { ref } from 'vue';
 
 export default {
     data() {
-        let videos = ref([])
-        //let videos = ref([{thumbnail:'https://images.unsplash.com/photo-1608848461950-0fe51dfc41cb?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8fA%3D%3D', key: 'test', title: 'test', description: 'test', status: 1, workerStatus: { statusMessage: 'asd' } }])
+        //let videos = ref([])
+        let videos = ref([{thumbnail:'https://images.unsplash.com/photo-1608848461950-0fe51dfc41cb?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8fA%3D%3D', key: 'test', title: 'test', description: 'test', status: 1, workerStatus: { statusMessage: 'asd' } }])
         return {
             videos,
             loading: false,
