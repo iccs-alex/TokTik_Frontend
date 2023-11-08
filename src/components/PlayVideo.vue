@@ -3,7 +3,7 @@
     <!-- Video Section -->
     <div style="width: 70%">
       <video ref="videoPlayer" class="h-100 vjs-16-9 video-js vjs-default-skin videoPlayer" preload="auto" controls data-setup='{}'>
-        <source />
+        <source type="application/x-mpegURL" />
       </video>
     </div>
 
@@ -70,11 +70,11 @@ export default {
     })
 
     let playlistBlob = new Blob([], {type: "text/plain"});
-    const playlist_ = await fetch(playlistUrl).then((res) => res.text()).then((text) => {
+    const playlist_ = await fetch(playlistUrl).then((res) => res.text()).then(async (text) => {
       let lines = text.split('\n')
-      lines.forEach((line) => {
+      lines.forEach(async (line) => {
         if(line.includes("chunks")) {
-          const presignedChunk = this.getPresignedChunk(line)
+          const presignedChunk = await this.getPresignedChunk(line)
           playlistBlob = new Blob([playlistBlob,presignedChunk+"\n"], {type: "text/plain"})
           console.log(presignedChunk+"\n")
         }
@@ -131,7 +131,7 @@ export default {
       return await this.axios.get("/api/video?key=chunked_videos/" + this.$route.params.key + "/playlist.m3u8", { headers: { 'Authorization': 'Bearer ' + this.token } }).then(response => response.data)
     },
     async getPresignedChunk(chunkFile:string) {
-      return await this.axios.get("/api/video?key=chunked_videos/"+this.$route.params.key+"/chunks/"+chunkFile)      
+      return await this.axios.get("/api/video?key=chunked_videos/"+this.$route.params.key+"/"+chunkFile, { headers: { 'Authorization': 'Bearer ' + this.token } }).then(response => response.data)
     },
     async getS3Token() {
       const url: string = await this.axios.get("/api/video?key=chunked_videos/" + this.$route.params.key + "/playlist.m3u8", { headers: { 'Authorization': 'Bearer ' + this.token } }).then(response => response.data)

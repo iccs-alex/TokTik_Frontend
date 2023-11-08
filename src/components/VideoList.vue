@@ -8,18 +8,13 @@
             <div class="d-flex justify-space-between mb-12 mt-12 ">
                 <div v-for="video in videos">
 
-                    <v-card variant="elevated" color="secondary" class="mb-10">
+                    <v-card @click="playVideo(video.key)"  style="background-color:transparent" variant="elevated" class="mb-10">
                         <template v-if="video.status == 1">
                             <div class="flex-column">
                                 <v-card-title class="">{{ video.title }}</v-card-title>
                                 <v-card-text>{{ video.description }}</v-card-text>
-                                <!-- <img :id="'thumbnail-' + video.key" :src="thumbnail"> -->
-                                <v-img :width="300" aspect-ratio="16/9" cover :id="'thumbnail-' + video.key" src="@/assets/logo.png"></v-img>
+                                <v-img class="image" :src="video.thumbnail" width="300" height="300" cover :id="'thumbnail'"></v-img>
                             </div>
-                            <v-card-actions>
-                                <v-btn @click="playVideo(video.key)" variant="tonal" icon="mdi-play"></v-btn>
-                                <v-btn @click="deleteVideo(video.key)" variant="tonal" icon="mdi-delete"></v-btn>
-                            </v-card-actions>
                         </template>
                         <template v-else>
                             <div class="d-flex flex-column flex-no-wrap">
@@ -30,7 +25,7 @@
                                         <v-card-text>{{ video.description }}</v-card-text>
                                     </div>
                                     <div class="d-flex flex-grow-1 flex-column align-center justify-center">
-                                        <h4>The video is {{video.workerStatus.statusMessage}}.</h4>
+                                        <h4>The video is {{ video.workerStatus.statusMessage }}.</h4>
                                         <h4>Refresh in a few seconds.</h4>
                                     </div>
                                 </div>
@@ -53,57 +48,51 @@ import { ref } from 'vue';
 export default {
     data() {
         //let videos = ref([])
-        let videos = ref([{key: 'test', title:'test', description:'test', status:1, workerStatus:{statusMessage: 'asd'}}])
-        let thumbnail = ref("")
+        let videos = ref([{thumbnail:'https://images.unsplash.com/photo-1608848461950-0fe51dfc41cb?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8fA%3D%3D', key: 'test', title: 'test', description: 'test', status: 1, workerStatus: { statusMessage: 'asd' } }])
         return {
             videos,
-            thumbnail,
             loading: false,
-            token: localStorage.getItem("jwt")
+            token: localStorage.getItem("jwt"),
         }
+    },
+    mounted() {
+        //this.getVideos()
     },
     methods: {
         async getVideos() {
             this.loading = true
 
             try {
-                let videos = await this.axios.get("/api/videos", {headers: {'Authorization': 'Bearer ' + this.token}}).then(response => response.data);
+                let videos = await this.axios.get("/api/videos", { headers: { 'Authorization': 'Bearer ' + this.token } }).then(response => response.data);
                 this.videos = ref(videos)
                 for (let i = 0; i < videos.length; i++) {
-                    const playlist_url = await this.axios.get("/api/video?key=chunked_videos/" + videos[i].key + "/playlist.m3u8", {headers: {'Authorization': 'Bearer ' + this.token}}).then(response => response.data)
+                    const playlist_url = await this.axios.get("/api/video?key=chunked_videos/" + videos[i].key + "/playlist.m3u8", { headers: { 'Authorization': 'Bearer ' + this.token } }).then(response => response.data)
                     const response = await fetch(playlist_url, { method: "GET", headers: {} })
-                    if(response.status == 404) {
-                        videos[i]["status"] = 0    
+                    if (response.status == 404) {
+                        videos[i]["status"] = 0
 
                         // Get worker status from backend
-                        const workerStatus = await this.axios.get("/api/worker_status", {headers: {'Authorization': 'Bearer ' + this.token}}).then(response => response.data)
+                        const workerStatus = await this.axios.get("/api/worker_status", { headers: { 'Authorization': 'Bearer ' + this.token } }).then(response => response.data)
                         videos[i]["workerStatus"] = workerStatus
                         continue
                     } else {
                         videos[i]["status"] = 1
-                        videos[i]["workerStatus"] = {workerStatus: {workerStatus: {statusMessage: ''}}}
+                        videos[i]["workerStatus"] = { workerStatus: { workerStatus: { statusMessage: '' } } }
                     }
                     this.videos = ref(videos)
 
-                    const thumbnail_url = await this.axios.get("/api/video?key=thumbnail/" + videos[i].key, {headers: {'Authorization': 'Bearer ' + this.token}}).then(response => response.data)
-                    const thumbnail_bytes = await fetch(thumbnail_url, { method: "GET", headers: {} })
-
-                    const thumbnail_blob = thumbnail_bytes.blob().then(blob => {
-                        const thumbnailUrl = URL.createObjectURL(blob)
-
-                        const thumbnailEl: HTMLImageElement = document.querySelector('#thumbnail-' + videos[i].key);
-                        thumbnailEl.src = thumbnailUrl
-                    })
+                    const thumbnail_url = await this.axios.get("/api/video?key=thumbnail/" + videos[i].key, { headers: { 'Authorization': 'Bearer ' + this.token } }).then(response => response.data)
+                    this.videos[i]["thumbnail"] = thumbnail_url
                 }
-            } catch(e) {
+            } catch (e) {
                 this.loading = false
-
+                alert("Server not alive.")
             }
-
+            console.log(this.videos);            
             this.loading = false
         },
         async deleteVideo(key: string) {
-            const url = await this.axios.delete("/api/video?key=" + key, {headers: {'Authorization': 'Bearer ' + this.token}}).then(response => response.data);
+            const url = await this.axios.delete("/api/video?key=" + key, { headers: { 'Authorization': 'Bearer ' + this.token } }).then(response => response.data);
 
             await fetch(url, {
                 method: "DELETE",
