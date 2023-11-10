@@ -2,10 +2,12 @@
     <v-container class="fill-height">
         <v-responsive class="px-4 py-4 fill-height">
             <h3 class="text-h4 font-weight-bold">Videos</h3>
-
+            <v-btn @click="connectSocket">Connect Socket</v-btn>
+            <v-btn @click="disconnectSocket">Diconnect Socket</v-btn>
+            <v-btn @click="sendMessage">Send message</v-btn>
             <div class="py-6" />
             <v-btn :loading="loading" prepend-icon="mdi-refresh" @click="getVideos">Refresh</v-btn>
-            <div class="d-flex justify-space-between mb-12 mt-12 ">
+            <div class="d-flex mb-12 mt-12" style="gap: 12px">
                 <div v-for="video in videos">
 
                     <v-card @click="playVideo(video.key)" style="background-color:transparent" variant="elevated"
@@ -52,12 +54,13 @@
 import Vue from "vue";
 import axios from "axios";
 import { ref } from 'vue';
+import { socket, state } from "@/socket";
 
 
 export default {
     data() {
-        //let videos = ref([])
-        let videos = ref([{thumbnail:'https://images.unsplash.com/photo-1608848461950-0fe51dfc41cb?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8fA%3D%3D', key: 'test', title: 'test', description: 'test', status: 1, workerStatus: { statusMessage: 'asd' } }])
+        let videos = ref([])
+        //let videos = ref([{thumbnail:'https://images.unsplash.com/photo-1608848461950-0fe51dfc41cb?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8fA%3D%3D', key: 'test', title: 'test', description: 'test', status: 1, workerStatus: { statusMessage: 'asd' } }])
         return {
             videos,
             loading: false,
@@ -67,30 +70,51 @@ export default {
     mounted() {
         this.getVideos()
     },
+    computed: {
+        connected() {
+            return state.connected;
+        }
+    },
     methods: {
+        connectSocket() {
+            console.log("Connect");
+            
+            socket.connect()
+        },
+        disconnectSocket() {
+            console.log("Disconnect");
+            
+            socket.disconnect()
+        },
+        sendMessage() {
+            console.log("Sending message");
+            
+            socket.timeout(5000).emit("Create Something", "ThisIsAMessage", () => {console.log("Message was sent");
+            })
+        },
         async getVideos() {
             this.loading = true
 
             try {
-                let videos = await this.axios.get("/api/videos", { headers: { 'Authorization': 'Bearer ' + this.token } }).then(response => response.data);
+                let videos = await this.axios.get("/api/videos").then(response => response.data);
                 this.videos = ref(videos)
                 for (let i = 0; i < videos.length; i++) {
-                    const playlist_url = await this.axios.get("/api/video?key=chunked_videos/" + videos[i].key + "/playlist.m3u8", { headers: { 'Authorization': 'Bearer ' + this.token } }).then(response => response.data)
+                    const playlist_url = await this.axios.get("/api/video?key=chunked_videos/" + videos[i].key + "/playlist.m3u8").then(response => response.data)
                     const response = await fetch(playlist_url, { method: "GET", headers: {} })
                     if (response.status == 404) {
                         videos[i]["status"] = 0
 
                         // Get worker status from backend
-                        const workerStatus = await this.axios.get("/api/worker_status", { headers: { 'Authorization': 'Bearer ' + this.token } }).then(response => response.data)
+                        const workerStatus = await this.axios.get("/api/worker_status").then(response => response.data)
                         videos[i]["workerStatus"] = workerStatus
+                        console.log(workerStatus);
                         continue
                     } else {
                         videos[i]["status"] = 1
-                        videos[i]["workerStatus"] = { workerStatus: { workerStatus: { statusMessage: '' } } }
+                        videos[i]["workerStatus"] = { statusMessage: '' }
                     }
-                    this.videos = ref(videos)
 
-                    const thumbnail_url = await this.axios.get("/api/video?key=thumbnail/" + videos[i].key, { headers: { 'Authorization': 'Bearer ' + this.token } }).then(response => response.data)
+                    const thumbnail_url = await this.axios.get("/api/video?key=thumbnail/" + videos[i].key).then(response => response.data)
                     this.videos[i]["thumbnail"] = thumbnail_url
                 }
             } catch (e) {
@@ -111,7 +135,7 @@ export default {
             this.getVideos();
         },
         playVideo(key: String) {
-            this.$router.push({ name: 'PlayVideo', params: { key: key as any } });
+            this.$router.push({ name: 'PlayVideo', params: { key: key as any }, query: { key: key as any } });
         }
     },
 }

@@ -59,11 +59,12 @@ import videojs from 'video.js';
 import 'video.js/dist/video-js.css'; // Import the CSS file
 import '@/css/videoPlayer.css'
 import { tSThisType } from "@babel/types";
+import { useRoute } from 'vue-router'
 
 export default {
   async mounted() {
     const videoElement = this.$refs.videoPlayer as Element;
-
+    
     const signedPlaylistUrl = await this.getSignedPlaylistUrl()
 
     this.thumbnailUrl = await this.getThumbnailUrl()
@@ -72,11 +73,12 @@ export default {
     this.player = videojs(videoElement, {
       autoplay: false,
       errorDisplay: false,
+      poster: this.thumbnailUrl,
       userActions: {
         doubleClick: false,
       },
       src: {
-        src: "signedPlaylistUrl",
+        src: signedPlaylistUrl,
         type: 'application/x-mpegURL',
         withCredentials: false,
       }
@@ -87,7 +89,7 @@ export default {
     videojs.hook('beforeerror', this.videoErrorHandler);
 
     // Play the video
-    await this.player.play();
+    await this.player.play();    
     this.videoLoading = false
   },
   beforeDestroy() {
@@ -106,6 +108,7 @@ export default {
       videoLoading: true,
       commentSubmitLoading: false,
       liked: false,
+      route: null
     }
   },
   methods: {
@@ -163,22 +166,22 @@ export default {
       }
     },
     async getPlaylistFile() {
-      const url: string = await this.axios.get("/api/video?key=chunked_videos/" + this.$route.params.key + "/playlist.m3u8", { headers: { 'Authorization': 'Bearer ' + this.token } }).then(response => response.data)
+      const url: string = await this.axios.get("/api/video?key=chunked_videos/" + this.$route.query.key + "/playlist.m3u8").then(response => response.data)
       const playlistFile = await fetch(url, { method: 'GET', headers: {} })
       return playlistFile
     },
     async getPlaylistUrl() {
-      return await this.axios.get("/api/video?key=chunked_videos/" + this.$route.params.key + "/playlist.m3u8", { headers: { 'Authorization': 'Bearer ' + this.token } }).then(response => response.data)
+      return await this.axios.get("/api/video?key=chunked_videos/" + this.$route.query.key + "/playlist.m3u8").then(response => response.data)
     },
     async getPresignedChunk(chunkFile: string) {
-      return await this.axios.get("/api/video?key=chunked_videos/" + this.$route.params.key + "/" + chunkFile, { headers: { 'Authorization': 'Bearer ' + this.token } }).then(response => response.data)
+      return await this.axios.get("/api/video?key=chunked_videos/" + this.$route.query.key + "/" + chunkFile).then(response => response.data)
     },
     async getS3Token() {
-      const url: string = await this.axios.get("/api/video?key=chunked_videos/" + this.$route.params.key + "/playlist.m3u8", { headers: { 'Authorization': 'Bearer ' + this.token } }).then(response => response.data)
+      const url: string = await this.axios.get("/api/video?key=chunked_videos/" + this.$route.query.key + "/playlist.m3u8",).then(response => response.data)
       return url.split('playlist.m3u8')[1]
     },
     async getThumbnailUrl() {
-      return await this.axios.get("/api/video?key=thumbnail/" + this.$route.params.key, { headers: { 'Authorization': 'Bearer ' + this.token } }).then(response => response.data)
+      return await this.axios.get("/api/video?key=thumbnail/" + this.$route.query.key).then(response => response.data)
     }
   }
 

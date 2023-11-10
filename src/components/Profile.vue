@@ -74,16 +74,16 @@ export default {
             this.loading = true
 
             try {
-                let videos = await this.axios.get("/api/videos", { headers: { 'Authorization': 'Bearer ' + this.token } }).then(response => response.data);
+                let videos = await this.axios.get("/api/videos").then(response => response.data);
                 this.videos = ref(videos)
                 for (let i = 0; i < videos.length; i++) {
-                    const playlist_url = await this.axios.get("/api/video?key=chunked_videos/" + videos[i].key + "/playlist.m3u8", { headers: { 'Authorization': 'Bearer ' + this.token } }).then(response => response.data)
+                    const playlist_url = await this.axios.get("/api/video?key=chunked_videos/" + videos[i].key + "/playlist.m3u8").then(response => response.data)
                     const response = await fetch(playlist_url, { method: "GET", headers: {} })
                     if (response.status == 404) {
                         videos[i]["status"] = 0
 
                         // Get worker status from backend
-                        const workerStatus = await this.axios.get("/api/worker_status", { headers: { 'Authorization': 'Bearer ' + this.token } }).then(response => response.data)
+                        const workerStatus = await this.axios.get("/api/worker_status").then(response => response.data)
                         videos[i]["workerStatus"] = workerStatus
                         continue
                     } else {
@@ -92,7 +92,7 @@ export default {
                     }
                     this.videos = ref(videos)
 
-                    const thumbnail_url = await this.axios.get("/api/video?key=thumbnail/" + videos[i].key, { headers: { 'Authorization': 'Bearer ' + this.token } }).then(response => response.data)
+                    const thumbnail_url = await this.axios.get("/api/video?key=thumbnail/" + videos[i].key).then(response => response.data)
                     this.videos[i]["thumbnail"] = thumbnail_url
                 }
             } catch (e) {

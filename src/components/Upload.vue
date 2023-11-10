@@ -74,7 +74,7 @@ export default {
         return this.axios.put("/api/video", { key: key, title: title, description: description }, {headers: {'Authorization': 'Bearer ' + this.token}}).then(response => response.data);
       }
       else if (method === "GET") {
-        return this.axios.get("/api/video?key=" + 'videos/' + title, {headers: {'Authorization': 'Bearer ' + this.token}}).then(response => response.data);
+        return this.axios.get("/api/video?key=" + 'videos/' + title).then(response => response.data);
       }
     },
     async upload() {
