@@ -1,7 +1,7 @@
 <template>
     <v-container class="fill-height">
         <v-responsive class="px-4 py-4 fill-height">
-            <h3 class="text-h4 font-weight-bold">Videos</h3>
+            <h3 class="text-h4 font-weight-bold">Videos {{ connected }}</h3>
             <v-btn @click="connectSocket">Connect Socket</v-btn>
             <v-btn @click="disconnectSocket">Diconnect Socket</v-btn>
             <v-btn @click="sendMessage">Send message</v-btn>

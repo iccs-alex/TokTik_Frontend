@@ -1,29 +1,37 @@
 import { reactive } from "vue";
 import { io } from "socket.io-client";
+import { log } from "node:console";
 
 export const state = reactive({
-  connected: false,
-  fooEvents: [],
-  barEvents: []
+  connected: false
 });
 
-// "undefined" means the URL will be computed from the `window.location` object
 const URL = "127.0.0.1";
 
-export const socket = io(URL, { path: "/socketio" , transports: ["websocket"]});
+export const socket = io(URL);
 
-socket.on("connect", () => {
-  state.connected = true;
+let users = [];
+
+socket.on("users", (users_) => {
+  // put the current user first, and then sort by username
+  users = users_
+  console.log("Connected users");
+  console.log(users);
 });
+
+
+socket.on("user connected", (user) => {
+  users.push(user);
+  console.log("User connected: " + user.username);
+});
+
+
+socket.auth = { username: "blue" };
+socket.connect();
+connected = true
 
 socket.on("disconnect", () => {
-  state.connected = false;
-});
 
-socket.on("foo", (...args) => {
-  state.fooEvents.push(args);
-});
+  console.log("Disconnected...");
 
-socket.on("bar", (...args) => {
-  state.barEvents.push(args);
 });
