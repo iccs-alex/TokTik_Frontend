@@ -108,8 +108,8 @@ export default {
       liked: false,
       route: null,
       pageRoom: 'video:' + this.$route.params.key,
-      viewCount: -1,
-      likeCount: -1,
+      viewCount: null,
+      likeCount: null,
     }
   },
   methods: {

@@ -2,9 +2,6 @@
     <v-container class="fill-height">
         <v-responsive class="px-4 py-4 fill-height">
             <h3 class="text-h4 font-weight-bold">Videos</h3>
-            <v-btn @click="connectSocket">Connect Socket</v-btn>
-            <v-btn @click="disconnectSocket">Diconnect Socket</v-btn>
-            <v-btn @click="sendMessage">Send message</v-btn>
             <div class="py-6" />
             <v-btn :loading="loading" prepend-icon="mdi-refresh" @click="getVideos">Refresh</v-btn>
             <div class="d-flex mb-12 mt-12 flex-wrap" style="gap: 12px">
