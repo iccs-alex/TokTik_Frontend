@@ -7,7 +7,7 @@
             <v-btn @click="sendMessage">Send message</v-btn>
             <div class="py-6" />
             <v-btn :loading="loading" prepend-icon="mdi-refresh" @click="getVideos">Refresh</v-btn>
-            <div class="d-flex mb-12 mt-12" style="gap: 12px">
+            <div class="d-flex mb-12 mt-12 flex-wrap" style="gap: 12px">
                 <div v-for="video in videos">
 
                     <v-card @click="playVideo(video.key)" style="background-color:transparent" variant="elevated"

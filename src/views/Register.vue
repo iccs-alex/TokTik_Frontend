@@ -105,6 +105,7 @@ export default {
           alert("Registration failed")
         }
       }
+      store.username = this.username
       this.loading = false
     },
     reset() {

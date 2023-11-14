@@ -30,9 +30,9 @@
             <p>{{ viewCount }}</p>
           </div>
           <div class="d-flex" style="gap:10px">
-            <v-icon v-if="liked" @click="toggleLike" icon="mdi-heart" color="tiktokRed" />
-            <v-icon v-else @click="toggleLike" icon="mdi-heart-outline" color="tiktokRed" />
-            <p>4</p>
+            <v-icon v-if="liked" @click="unlikeVideo" icon="mdi-heart" color="tiktokRed" />
+            <v-icon v-else @click="likeVideo" icon="mdi-heart-outline" color="tiktokRed" />
+            <p>{{ likeCount }}</p>
           </div>
           <div class="d-flex" style="gap:10px">
             <v-icon icon="mdi-message-processing-outline" color="tiktokBlue" />
@@ -68,16 +68,23 @@ import videojs from 'video.js';
 import 'video.js/dist/video-js.css'; // Import the CSS file
 import '@/css/videoPlayer.css'
 import { socket, joinRoom, leaveRoom } from "@/socket";
+import { useAppStore } from '@/store/app'
+const store = useAppStore()
 
 export default {
   async mounted() {
     this.initVideoPlayer()
     this.incrementView()
+    this.syncVideoInfo()
 
     joinRoom(this.pageRoom)
     socket.on('viewUpdate', (data) => {
       console.log('The view count is now' + data)
       this.viewCount = data
+    })
+    socket.on('likeUpdate', (data) => {
+      console.log('The like count is now' + data)
+      this.likeCount = data
     })
   },
   beforeUnmount() {
@@ -102,6 +109,7 @@ export default {
       route: null,
       pageRoom: 'video:' + this.$route.params.key,
       viewCount: -1,
+      likeCount: -1,
     }
   },
   methods: {
@@ -134,22 +142,48 @@ export default {
       this.videoLoading = false
 
     },
+    async syncVideoInfo() {
+      try {
+        const res = await this.axios.get('/api/video/details?key=' + this.$route.params.key)
+        const videoDetails = res.data
+        console.log(videoDetails);
+        this.likeCount = videoDetails.likeCount
+        this.liked = videoDetails.userLikes.includes(store.username)
+      } catch (e) {
+      }
+    },
     async incrementView() {
       try {
-        const res = await this.axios.post('/api/view?key=' + this.$route.params.key)
+        const res = await this.axios.post('/api/video/view?key=' + this.$route.params.key)
         this.viewCount = res.data
       } catch (e) {
       }
     },
-    async toggleLike() {
-      console.log("Liked");
-      this.liked = !this.liked
-
+    async likeVideo() {
+      if(store.username === '') {
+        this.$router.push('/Login');
+        return
+      }
+      try {
+        const res = await this.axios.post('/api/video/like?key=' + this.$route.params.key + '&username=' + store.username)
+        this.likeCount = res.data
+        this.liked = true
+      } catch(e) {
+      }
     },
-    async loadCommentSection() {
-
+    async unlikeVideo() {
+      try {
+        const res = await this.axios.post('/api/video/unlike?key=' + this.$route.params.key + '&username=' + store.username)
+        this.likeCount = res.data
+        this.liked = false
+      } catch(e) {
+      }
     },
     async submitComment() {
+      if(store.username === '') {
+        this.$router.push('/Login');
+        return
+      }
       this.commentSubmitLoading = true
     },
     async videoErrorHandler(player, err) {
