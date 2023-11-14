@@ -2,6 +2,7 @@
   <v-container class="d-flex h-screen">
     <v-responsive class="px-4 py-4 align-center justify-center">
           <v-sheet width="400" class="ma-auto pa-5">
+            
             <v-container @click="$router.push('/')" style="cursor: pointer" class="text-center text-h5 mt-2 mb-5" :style="{color:$vuetify.theme.themes.dark.colors.tiktokBlue}">
               <v-icon color="tiktokRed" icon="mdi-music-circle-outline" />
               TokTik
