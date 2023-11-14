@@ -1,7 +1,7 @@
 <template>
     <v-container class="fill-height">
         <v-responsive class="px-4 py-4 fill-height">
-            <h3 class="text-h4 font-weight-bold">Videos {{ connected }}</h3>
+            <h3 class="text-h4 font-weight-bold">Videos</h3>
             <v-btn @click="connectSocket">Connect Socket</v-btn>
             <v-btn @click="disconnectSocket">Diconnect Socket</v-btn>
             <v-btn @click="sendMessage">Send message</v-btn>
@@ -54,7 +54,7 @@
 import Vue from "vue";
 import axios from "axios";
 import { ref } from 'vue';
-import { socket, state } from "@/socket";
+import { socket, joinRoom, leaveRoom } from "@/socket";
 
 
 export default {
@@ -65,15 +65,15 @@ export default {
             videos,
             loading: false,
             token: localStorage.getItem("jwt"),
+            pageRoom: 'home'
         }
     },
     mounted() {
         this.getVideos()
+        joinRoom(this.pageRoom)
     },
-    computed: {
-        connected() {
-            return state.connected;
-        }
+    unmounted() {
+        leaveRoom(this.pageRoom)
     },
     methods: {
         connectSocket() {

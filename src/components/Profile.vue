@@ -54,7 +54,7 @@
 import Vue from "vue";
 import axios from "axios";
 import { ref } from 'vue';
-
+import { socket, joinRoom, leaveRoom } from "@/socket";
 
 export default {
     data() {

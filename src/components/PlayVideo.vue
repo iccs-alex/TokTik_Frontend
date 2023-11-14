@@ -2,49 +2,58 @@
   <div class="w-100 h-100 d-flex flex-column">
     <div class="d-flex flex-grow-1">
       <!-- Video Section -->
-      <div  style="width: 70%" class="h-100">
+      <div style="width: 70%" class="h-100">
         <div style="position:relative" class="w-100 h-100">
-          <video ref="videoPlayer" style="position:relative;top:0px;left:0px" class="w-100 h-100 video-js vjs-default-skin videoPlayer" loop>
+          <video ref="videoPlayer" style="position:relative;top:0px;left:0px"
+            class="w-100 h-100 video-js vjs-default-skin videoPlayer" loop>
             <source style="position: relative;top:0px;left:0px" class="w-100 h-100" type="application/x-mpegURL" />
           </video>
-          <v-progress-circular style="z-index: 1;position: absolute;top:50%;left:50%;transform: translate(-50%);" v-if="videoLoading" color="blue-lighten-3" indeterminate :size="50"></v-progress-circular>
+          <v-progress-circular style="z-index: 1;position: absolute;top:50%;left:50%;transform: translate(-50%);"
+            v-if="videoLoading" color="blue-lighten-3" indeterminate :size="50"></v-progress-circular>
         </div>
-        
+
       </div>
-  
+
       <!-- Comment Section -->
       <div class="flex-grow-1 pa-4 flex-column d-flex" style="gap:15px">
-  
+
         <v-card variant="elevated">
           <v-card-title>Title</v-card-title>
           <v-card-text>Description</v-card-text>
         </v-card>
-  
-        <v-sheet :style="{backgroundColor: 'transparent',border:'1px solid black',borderColor:$vuetify.theme.current.colors.primary}" rounded class="w-100 pa-2 d-flex justify-space-evenly">
+
+        <v-sheet
+          :style="{ backgroundColor: 'transparent', border: '1px solid black', borderColor: $vuetify.theme.current.colors.primary }"
+          rounded class="w-100 pa-2 d-flex justify-space-evenly">
           <div class="d-flex" style="gap:10px">
-            <v-icon v-if="liked" @click="toggleLike" icon="mdi-heart" color="tiktokRed"/>
+            <v-icon icon="mdi-eye-outline" color="primary" />
+            <p>{{ viewCount }}</p>
+          </div>
+          <div class="d-flex" style="gap:10px">
+            <v-icon v-if="liked" @click="toggleLike" icon="mdi-heart" color="tiktokRed" />
             <v-icon v-else @click="toggleLike" icon="mdi-heart-outline" color="tiktokRed" />
             <p>4</p>
           </div>
           <div class="d-flex" style="gap:10px">
-            <v-icon icon="mdi-message-processing-outline" color="tiktokBlue"/>
+            <v-icon icon="mdi-message-processing-outline" color="tiktokBlue" />
             <p>10</p>
           </div>
         </v-sheet>
-  
+
         <div class="flex-grow-1">
           <h3 class="text-center mt-4 mb-3">- - - - Comments - - - -</h3>
-  
+
           <v-card variant="elevated">
             <v-card-title>Person</v-card-title>
             <v-card-text>I am saying something awesome.</v-card-text>
           </v-card>
-  
+
         </div>
-  
+
         <div class="d-flex flex-column align-center">
           <v-textarea class="w-100" no-resize rows=2 row-height="5" clearable></v-textarea>
-          <v-btn class="w-75" style="height:50px" @click="submitComment" variant="tonal" :loading="commentSubmitLoading" color="tiktokRed">Submit Comment</v-btn>
+          <v-btn class="w-75" style="height:50px" @click="submitComment" variant="tonal" :loading="commentSubmitLoading"
+            color="tiktokRed">Submit Comment</v-btn>
         </div>
       </div>
     </div>
@@ -58,45 +67,27 @@ import { ref } from 'vue';
 import videojs from 'video.js';
 import 'video.js/dist/video-js.css'; // Import the CSS file
 import '@/css/videoPlayer.css'
-import { tSThisType } from "@babel/types";
-import { useRoute } from 'vue-router'
+import { socket, joinRoom, leaveRoom } from "@/socket";
 
 export default {
   async mounted() {
-    const videoElement = this.$refs.videoPlayer as Element;
-    
-    const signedPlaylistUrl = await this.getSignedPlaylistUrl()
+    this.initVideoPlayer()
+    this.incrementView()
 
-    this.thumbnailUrl = await this.getThumbnailUrl()
-
-    // Initialize the video player
-    this.player = videojs(videoElement, {
-      autoplay: false,
-      errorDisplay: false,
-      poster: this.thumbnailUrl,
-      userActions: {
-        doubleClick: false,
-      },
-      src: {
-        src: signedPlaylistUrl,
-        type: 'application/x-mpegURL',
-        withCredentials: false,
-      }
-    });
-
-    this.player.on('click', this.videoClickHandler)
-
-    videojs.hook('beforeerror', this.videoErrorHandler);
-
-    // Play the video
-    await this.player.play();    
-    this.videoLoading = false
+    joinRoom(this.pageRoom)
+    socket.on('viewUpdate', (data) => {
+      console.log('The view count is now' + data)
+      this.viewCount = data
+    })
   },
-  beforeDestroy() {
+  beforeUnmount() {
     // Dispose of the video player when the component is destroyed
     if (this.player) {
+      console.log("Destory player");
+
       this.player.dispose();
     }
+    leaveRoom(this.pageRoom)
   },
   data() {
     const player: any = null
@@ -108,17 +99,55 @@ export default {
       videoLoading: true,
       commentSubmitLoading: false,
       liked: false,
-      route: null
+      route: null,
+      pageRoom: 'video:' + this.$route.params.key,
+      viewCount: -1,
     }
   },
   methods: {
+    async initVideoPlayer() {
+      const videoElement = this.$refs.videoPlayer as Element;
+      const signedPlaylistUrl = await this.getSignedPlaylistUrl()
+      this.thumbnailUrl = await this.getThumbnailUrl()
+
+      // Initialize the video player
+      this.player = videojs(videoElement, {
+        autoplay: false,
+        errorDisplay: false,
+        loadingSpinner: false,
+        poster: this.thumbnailUrl,
+        userActions: {
+          doubleClick: false,
+        }
+      });
+
+      this.player.src({
+        src: signedPlaylistUrl,
+        type: 'application/x-mpegURL',
+        withCredentials: false,
+      })
+
+      this.player.on('click', this.videoClickHandler)
+
+      // Play the video
+      await this.player.play();
+      this.videoLoading = false
+
+    },
+    async incrementView() {
+      try {
+        const res = await this.axios.post('/api/view?key=' + this.$route.params.key)
+        this.viewCount = res.data
+      } catch (e) {
+      }
+    },
     async toggleLike() {
       console.log("Liked");
       this.liked = !this.liked
 
     },
     async loadCommentSection() {
-  
+
     },
     async submitComment() {
       this.commentSubmitLoading = true
