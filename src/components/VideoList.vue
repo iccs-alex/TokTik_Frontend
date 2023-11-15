@@ -2,19 +2,16 @@
     <v-container class="fill-height">
         <v-responsive class="px-4 py-4 fill-height">
             <h3 class="text-h4 font-weight-bold">Videos</h3>
-            <div class="py-6" />
-            <v-btn :loading="loading" prepend-icon="mdi-refresh" @click="getVideos">Refresh</v-btn>
-            <div class="d-flex mb-12 mt-12 flex-wrap" style="gap: 12px">
-                <div v-for="video in videos">
+            <v-btn :loading="loading" prepend-icon="mdi-refresh" class="mb-6 mt-6" @click="getVideos">Refresh</v-btn>
+            <div class="d-flex flex-wrap" style="gap: 20px">
 
-                    <v-card @click="playVideo(video.key)" style="background-color:transparent" variant="elevated"
-                        class="mb-10">
+                    <v-card v-for="video in videos" @click="playVideo(video.key)" style="background-color:transparent" 
+                            variant="elevated" width="300" :height="500" class="flex-grow-1">
                         <template v-if="video.status == 1">
                             <div class="flex-column">
-                                <v-card-title class="">{{ video.title }}</v-card-title>
-                                <v-card-text>{{ video.description }}</v-card-text>
-                                <v-img class="image" :src="video.thumbnail" width="300" height="300" cover
-                                    :id="'thumbnail'">
+                                <v-card-title class="flex">{{ video.title }}</v-card-title>
+                                <v-card-text class="flex">{{ video.description }}</v-card-text>
+                                <v-img :aspect-ratio="9/16" class="image" cover :src="video.thumbnail" :id="'thumbnail'">
                                     <template v-slot:placeholder>
                                         <div class="d-flex align-center justify-center fill-height">
                                             <v-progress-circular color="grey-lighten-4" indeterminate></v-progress-circular>
@@ -41,7 +38,6 @@
                         </template>
                     </v-card>
 
-                </div>
             </div>
         </v-responsive>
     </v-container>
@@ -57,7 +53,14 @@ import { socket, joinRoom, leaveRoom } from "@/socket";
 export default {
     data() {
         let videos = ref([])
-        //let videos = ref([{thumbnail:'https://images.unsplash.com/photo-1608848461950-0fe51dfc41cb?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8fA%3D%3D', key: 'test', title: 'test', description: 'test', status: 1, workerStatus: { statusMessage: 'asd' } }])
+        // let videos = ref([
+        // {thumbnail:'https://images.unsplash.com/photo-1608848461950-0fe51dfc41cb?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8fA%3D%3D', key: 'test', title: 'tesdajsndkjasndkjasndkjn skdjna kjdns kdnsasadsadsadt', description: 'test', status: 1, workerStatus: { statusMessage: 'asd' } },
+        // {thumbnail:'https://images.unsplash.com/photo-1608848461950-0fe51dfc41cb?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8fA%3D%3D', key: 'test', title: 'test', description: 'test', status: 1, workerStatus: { statusMessage: 'asd' } },
+        // {thumbnail:'https://images.unsplash.com/photo-1608848461950-0fe51dfc41cb?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8fA%3D%3D', key: 'test', title: 'test', description: 'test', status: 1, workerStatus: { statusMessage: 'asd' } },
+        // {thumbnail:'https://images.unsplash.com/photo-1608848461950-0fe51dfc41cb?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8fA%3D%3D', key: 'test', title: 'test', description: 'test', status: 1, workerStatus: { statusMessage: 'asd' } },
+        // {thumbnail:'https://images.unsplash.com/photo-1608848461950-0fe51dfc41cb?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8fA%3D%3D', key: 'test', title: 'test', description: 'test', status: 1, workerStatus: { statusMessage: 'asd' } },
+        // {thumbnail:'https://images.unsplash.com/photo-1608848461950-0fe51dfc41cb?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8fA%3D%3D', key: 'test', title: 'test', description: 'test', status: 1, workerStatus: { statusMessage: 'asd' } }
+        // ])
         return {
             videos,
             loading: false,

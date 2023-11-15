@@ -36,22 +36,22 @@
           </div>
           <div class="d-flex" style="gap:10px">
             <v-icon icon="mdi-message-processing-outline" color="tiktokBlue" />
-            <p>10</p>
+            <p>{{ comments.length }}</p>
           </div>
         </v-sheet>
 
         <div class="flex-grow-1">
           <h3 class="text-center mt-4 mb-3">- - - - Comments - - - -</h3>
 
-          <v-card variant="elevated">
-            <v-card-title>Person</v-card-title>
-            <v-card-text>I am saying something awesome.</v-card-text>
+          <v-card v-for="comment in comments" variant="elevated">
+            <v-card-title>{{ comment.username }}</v-card-title>
+            <v-card-text>{{ comment.comment }}</v-card-text>
           </v-card>
 
         </div>
 
         <div class="d-flex flex-column align-center">
-          <v-textarea class="w-100" no-resize rows=2 row-height="5" clearable></v-textarea>
+          <v-textarea v-model="commenting" class="w-100" no-resize rows=2 row-height="5" clearable></v-textarea>
           <v-btn class="w-75" style="height:50px" @click="submitComment" variant="tonal" :loading="commentSubmitLoading"
             color="tiktokRed">Submit Comment</v-btn>
         </div>
@@ -86,6 +86,15 @@ export default {
       console.log('The like count is now' + data)
       this.likeCount = data
     })
+    socket.on('commentUpdate', async () => {
+      console.log('Getting comments')
+      try {
+        const res = await this.axios.get('/api/video/comments?key=' + this.$route.params.key)
+        this.comments = res.data
+      } catch(e) {
+
+      }
+    })
   },
   beforeUnmount() {
     // Dispose of the video player when the component is destroyed
@@ -110,6 +119,8 @@ export default {
       pageRoom: 'video:' + this.$route.params.key,
       viewCount: null,
       likeCount: null,
+      comments: [{username: "", comment: ""}],
+      commenting: '',
     }
   },
   methods: {
@@ -149,6 +160,7 @@ export default {
         console.log(videoDetails);
         this.likeCount = videoDetails.likeCount
         this.liked = videoDetails.userLikes.includes(store.username)
+        this.comments = videoDetails.videoComments
       } catch (e) {
       }
     },
@@ -184,7 +196,18 @@ export default {
         this.$router.push('/Login');
         return
       }
+
       this.commentSubmitLoading = true
+      console.log(this.commenting);
+      
+      try {
+        const res = await this.axios.post('/api/video/comment?key=' + this.$route.params.key + '&username=' + store.username, { comment: this.commenting} )
+      } catch(e) {
+
+      }
+
+      this.commenting = '';
+      this.commentSubmitLoading = false
     },
     async videoErrorHandler(player, err) {
       console.log(`player ${player.id()} has errored out with code ${err.code} ${err.message}`);
