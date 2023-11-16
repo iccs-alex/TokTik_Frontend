@@ -1,55 +1,38 @@
 <template>
   <v-container class="d-flex h-screen">
     <v-responsive class="px-4 py-4 align-center justify-center">
-          <v-sheet width="400" class="ma-auto pa-5">
-            
-            <v-container @click="$router.push('/')" style="cursor: pointer" class="text-center text-h5 mt-2 mb-5" :style="{color:$vuetify.theme.themes.dark.colors.tiktokBlue}">
-              <v-icon color="tiktokRed" icon="mdi-music-circle-outline" />
-              TokTik
-            </v-container>
+      <v-sheet width="500" class="ma-auto pa-8">
 
-            <v-form ref="form">
-              <v-text-field
-                v-model="username"
-                :rules="usernameRules"
-                label="Username"
-                required
-                ></v-text-field>
-              <v-text-field
-                v-model="password"
-                :append-inner-icon="show ? 'mdi-eye' : 'mdi-eye-off'"
-                :type="show ? 'text' : 'password'"
-                :rules="passwordRules"
-                label="Password"
-                @click:append-inner="show = !show"
-                required
-              ></v-text-field>
+        <div class="mb-8 pl-8 pr-8">
+          <v-container @click="$router.push('/')" style="cursor: pointer" class="text-center text-h5 mt-2 mb-5"
+            :style="{ color: $vuetify.theme.themes.dark.colors.tiktokBlue }">
+            <v-icon color="tiktokRed" icon="mdi-music-circle-outline" />
+            TokTik
+          </v-container>
 
-              <div class="d-flex flex-column">
-                <v-btn
-                  :disable="!valid"
-                  color="tiktokBlue"
-                  class="mt-4"
-                  @click="submit"
-                  :loading="loading"
-                >
-                  Log in
-                </v-btn>
+          <v-form ref="form">
+            <v-text-field v-model="username" :rules="usernameRules" label="Username" required></v-text-field>
+            <v-text-field v-model="password" :append-inner-icon="show ? 'mdi-eye' : 'mdi-eye-off'"
+              :type="show ? 'text' : 'password'" :rules="passwordRules" label="Password"
+              @click:append-inner="show = !show" required></v-text-field>
 
-                <v-btn
-                  color="primary"
-                  class="mt-4"
-                  block
-                  @click="reset"
-                >
-                  Clear
-                </v-btn>
-              </div>
-            </v-form>
-            <div class="mt-2">
-                <p class="text-body-2">Don't have an account? <a :style="{cursor: 'pointer',color:$vuetify.theme.themes.dark.colors.tiktokRed}" @click="$router.push('/Register')">Sign Up</a></p>
+            <div class="d-flex flex-column">
+              <v-btn :disable="!valid" color="tiktokBlue" class="mt-4" @click="submit" :loading="loading">
+                Log in
+              </v-btn>
+
+              <v-btn color="primary" class="mt-4" block @click="reset">
+                Clear
+              </v-btn>
             </div>
-          </v-sheet>
+          </v-form>
+          <div class="mt-2">
+            <p class="text-body-2">Don't have an account? <a
+                :style="{ cursor: 'pointer', color: $vuetify.theme.themes.dark.colors.tiktokRed }"
+                @click="$router.push('/Register')">Sign Up</a></p>
+          </div>
+        </div>
+      </v-sheet>
     </v-responsive>
   </v-container>
 </template>
@@ -77,9 +60,9 @@ export default {
         // submit to backend to authenticate
         let response;
         try {
-          response = await axios.post("/api/auth/login", {"username": this.username, "password": this.password});
+          response = await axios.post("/api/auth/login", { "username": this.username, "password": this.password });
         }
-        catch(e) {
+        catch (e) {
           console.log(response)
           this.loading = false
           alert("Invalid username or password.")
