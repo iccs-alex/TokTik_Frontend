@@ -44,8 +44,8 @@
           <h3 class="text-center mt-4 mb-3">- - - - Comments - - - -</h3>
 
           <v-virtual-scroll :items="comments" height="450">
-            <template v-slot:default="{item}">
-              <v-card  variant="elevated" class="mb-4">
+            <template v-slot:default="{ item }">
+              <v-card variant="elevated" class="mb-4">
                 <v-card-title>{{ item.username }}</v-card-title>
                 <v-card-text>{{ item.comment }}</v-card-text>
               </v-card>
@@ -96,7 +96,7 @@ export default {
       try {
         const res = await this.axios.get('/api/video/comments?key=' + this.$route.params.key)
         this.comments = res.data
-      } catch(e) {
+      } catch (e) {
 
       }
     })
@@ -125,13 +125,13 @@ export default {
       viewCount: null,
       likeCount: null,
       comments: [
-      {username: "Hello", comment: "World"},
-      {username: "Hello", comment: "World"},
-      {username: "Hello", comment: "World"},
-      {username: "Hello", comment: "World"},
-      {username: "Hello", comment: "World"},
-      {username: "Hello", comment: "World"},
-      {username: "Hello", comment: "World"},
+        // { username: "Hello", comment: "World" },
+        // { username: "Hello", comment: "World" },
+        // { username: "Hello", comment: "World" },
+        // { username: "Hello", comment: "World" },
+        // { username: "Hello", comment: "World" },
+        // { username: "Hello", comment: "World" },
+        // { username: "Hello", comment: "World" },
       ],
       commenting: '',
     }
@@ -171,10 +171,14 @@ export default {
         const res = await this.axios.get('/api/video/details?key=' + this.$route.params.key)
         const videoDetails = res.data
         console.log(videoDetails);
+        console.log(videoDetails.videoComments);
+        this.comments = videoDetails.videoComments
         this.likeCount = videoDetails.likeCount
         this.liked = videoDetails.userLikes.includes(store.username)
-        this.comments = videoDetails.videoComments
+        console.log("NO ERROR")
+
       } catch (e) {
+        console.log("ERROR")
       }
     },
     async incrementView() {
@@ -185,7 +189,7 @@ export default {
       }
     },
     async likeVideo() {
-      if(store.username === '') {
+      if (store.username === '') {
         this.$router.push('/Login');
         return
       }
@@ -193,31 +197,37 @@ export default {
         const res = await this.axios.post('/api/video/like?key=' + this.$route.params.key + '&username=' + store.username)
         this.likeCount = res.data
         this.liked = true
-      } catch(e) {
+      } catch (e) {
       }
+      joinRoom('notifComment:'+this.$route.params.key)
+
     },
     async unlikeVideo() {
       try {
         const res = await this.axios.post('/api/video/unlike?key=' + this.$route.params.key + '&username=' + store.username)
         this.likeCount = res.data
         this.liked = false
-      } catch(e) {
+      } catch (e) {
       }
+      leaveRoom('notifComment:'+this.$route.params.key)
+
     },
     async submitComment() {
-      if(store.username === '') {
+      if (store.username === '') {
         this.$router.push('/Login');
         return
       }
 
       this.commentSubmitLoading = true
       console.log(this.commenting);
-      
+
       try {
-        const res = await this.axios.post('/api/video/comment?key=' + this.$route.params.key + '&username=' + store.username, { comment: this.commenting} )
-      } catch(e) {
+        const res = await this.axios.post('/api/video/comment?key=' + this.$route.params.key + '&username=' + store.username, { comment: this.commenting })
+      } catch (e) {
 
       }
+
+      joinRoom('notifComment:'+this.$route.params.key)
 
       this.commenting = '';
       this.commentSubmitLoading = false

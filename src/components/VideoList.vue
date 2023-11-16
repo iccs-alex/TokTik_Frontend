@@ -7,7 +7,7 @@
 
                 <v-col cols="2" v-for="video in videos" class="ma-4">
                     <v-card @click="playVideo(video.key)" style="background-color:transparent" 
-                            variant="elevated" :height="500" class="">
+                            variant="elevated" :height="450" class="">
 
                         <!-- If video chunks exist -->
                         <template v-if="video.status == 1">
