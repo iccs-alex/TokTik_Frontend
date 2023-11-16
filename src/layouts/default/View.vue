@@ -1,6 +1,6 @@
 <template>
-  <v-main>
-    <router-view />
+  <v-main class="" >
+    <router-view fluid class="ma-0" />
   </v-main>
 </template>
 

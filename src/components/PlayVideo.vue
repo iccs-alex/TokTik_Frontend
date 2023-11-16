@@ -43,10 +43,15 @@
         <div class="flex-grow-1">
           <h3 class="text-center mt-4 mb-3">- - - - Comments - - - -</h3>
 
-          <v-card v-for="comment in comments" variant="elevated">
-            <v-card-title>{{ comment.username }}</v-card-title>
-            <v-card-text>{{ comment.comment }}</v-card-text>
-          </v-card>
+          <v-virtual-scroll :items="comments" height="450">
+            <template v-slot:default="{item}">
+              <v-card  variant="elevated" class="mb-4">
+                <v-card-title>{{ item.username }}</v-card-title>
+                <v-card-text>{{ item.comment }}</v-card-text>
+              </v-card>
+            </template>
+
+          </v-virtual-scroll>
 
         </div>
 
@@ -119,7 +124,15 @@ export default {
       pageRoom: 'video:' + this.$route.params.key,
       viewCount: null,
       likeCount: null,
-      comments: [{username: "", comment: ""}],
+      comments: [
+      {username: "Hello", comment: "World"},
+      {username: "Hello", comment: "World"},
+      {username: "Hello", comment: "World"},
+      {username: "Hello", comment: "World"},
+      {username: "Hello", comment: "World"},
+      {username: "Hello", comment: "World"},
+      {username: "Hello", comment: "World"},
+      ],
       commenting: '',
     }
   },
