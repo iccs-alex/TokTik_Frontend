@@ -67,6 +67,8 @@ export default {
     }
   },
   mounted() {
+    console.log("ASDASDASDSA");
+    
     this.items = [
       { title: "View Profile", event: this.viewProfile },
       { title: "Log out", event: this.logout }

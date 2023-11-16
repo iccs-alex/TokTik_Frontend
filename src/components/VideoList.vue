@@ -1,20 +1,19 @@
 <template>
     <v-container class="fill-height">
         <v-responsive class="px-4 py-4 fill-height">
-            <h3 class="text-h4 font-weight-bold">Videos</h3>
+            <h3 class="text-h4 font-weight-bold">Videos {{ cols }}</h3>
             <v-btn :loading="loading" prepend-icon="mdi-refresh" class="mb-6 mt-6" @click="getVideos">Refresh</v-btn>
             <v-row>
 
-                <v-col cols="2" v-for="video in videos" class="ma-4">
-                    <v-card @click="playVideo(video.key)" style="background-color:transparent" 
-                            variant="elevated" :height="450" class="">
+                <v-col :cols="cols" v-for="video in videos" class="ma-4">
+                    <v-card @click="playVideo(video.key)" style="background-color:transparent" variant="elevated" class="">
 
                         <!-- If video chunks exist -->
                         <template v-if="video.status == 1">
                             <div class="flex-column">
                                 <v-card-title class="flex">{{ video.title }}</v-card-title>
                                 <v-card-text class="flex">{{ video.description }}</v-card-text>
-                                <v-img :aspect-ratio="9/16" class="image" cover :src="video.thumbnail" :id="'thumbnail'">
+                                <v-img :aspect-ratio="9 / 16" class="image" cover :src="video.thumbnail" :id="'thumbnail'">
                                     <template v-slot:placeholder>
                                         <div class="d-flex align-center justify-center fill-height">
                                             <v-progress-circular color="grey-lighten-4" indeterminate></v-progress-circular>
@@ -60,16 +59,25 @@ export default {
     data() {
         //let videos = ref([])
         let videos = ref([
-         {thumbnail:'https://images.unsplash.com/photo-1608848461950-0fe51dfc41cb?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8fA%3D%3D', key: 'test', title: 'tesdajsndkjasndkjasndkjn skdjna kjdns kdnsasadsadsadt', description: 'test', status: 1, workerStatus: { statusMessage: 'asd' } },
-         {thumbnail:'https://images.unsplash.com/photo-1608848461950-0fe51dfc41cb?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8fA%3D%3D', key: 'test', title: 'test', description: 'test', status: 1, workerStatus: { statusMessage: 'asd' } },
-         {thumbnail:'https://images.unsplash.com/photo-1608848461950-0fe51dfc41cb?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8fA%3D%3D', key: 'test', title: 'test', description: 'test', status: 1, workerStatus: { statusMessage: 'asd' } }
-         ])
+            // { thumbnail: 'https://images.unsplash.com/photo-1608848461950-0fe51dfc41cb?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8fA%3D%3D', key: 'test', title: 'tesdajsndkjasndkjasndkjn skdjna kjdns kdnsasadsadsadt', description: 'test', status: 1, workerStatus: { statusMessage: 'asd' } },
+            // { thumbnail: 'https://images.unsplash.com/photo-1608848461950-0fe51dfc41cb?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8fA%3D%3D', key: 'test', title: 'test', description: 'test', status: 1, workerStatus: { statusMessage: 'asd' } },
+            // { thumbnail: 'https://images.unsplash.com/photo-1608848461950-0fe51dfc41cb?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8fA%3D%3D', key: 'test', title: 'test', description: 'test', status: 1, workerStatus: { statusMessage: 'asd' } }
+        ])
         return {
             videos,
             loading: false,
             token: localStorage.getItem("jwt"),
             pageRoom: 'home'
         }
+    },
+    computed: {
+        cols() {
+            const { lg, sm, xs } = this.$vuetify.display
+            return  lg ? 2
+                    : sm ? 4
+                    : xs ? 6
+                    : 3
+        },
     },
     mounted() {
         this.getVideos()
@@ -81,18 +89,19 @@ export default {
     methods: {
         connectSocket() {
             console.log("Connect");
-            
+
             socket.connect()
         },
         disconnectSocket() {
             console.log("Disconnect");
-            
+
             socket.disconnect()
         },
         sendMessage() {
             console.log("Sending message");
-            
-            socket.timeout(5000).emit("Create Something", "ThisIsAMessage", () => {console.log("Message was sent");
+
+            socket.timeout(5000).emit("Create Something", "ThisIsAMessage", () => {
+                console.log("Message was sent");
             })
         },
         async getVideos() {
