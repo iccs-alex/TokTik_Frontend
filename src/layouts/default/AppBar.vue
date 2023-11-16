@@ -14,18 +14,24 @@
         <template v-slot:activator="{ props: notifMenu }">
           <v-btn v-bind="notifMenu" class="mr-2" icon="mdi-bell-outline" />
         </template>
-        <v-list>
-          <v-list-item v-if="notifs.length === 0" class="">
-            <v-list-item-title class="text-center mb-6">No notifications.</v-list-item-title>
-            <v-list-item-title v-if="!isLoggedIn" class="text-center">Log in to receive notifications.</v-list-item-title>
-          </v-list-item>
 
-          <v-list-item v-for="notif in notifs">
-            <v-list-item-title>{{ notif.title }}</v-list-item-title>
-            <v-list-item-subtitle>{{ notif.message }}</v-list-item-subtitle>
-          </v-list-item>
-        </v-list>
+        <v-card v-if="notifs.length === 0" variant="elevated" class="mb-4 pa-6">
+          <h3 class="text-center mb-6">No notifications.</h3>
+          <p v-if="!isLoggedIn" class="text-center">Log in to receive notifications.</p>
+        </v-card>
+        <v-virtual-scroll :items="notifs" height="450">
+          <template v-slot:default="{ item }">
+            <v-card class="pa-2">
+              <v-card-title>{{ item.title }}</v-card-title>
+              <v-card-subtitle>{{ item.message }}</v-card-subtitle>
+            </v-card>
+          </template>
+
+        </v-virtual-scroll>
+
       </v-menu>
+
+
       <v-btn @click="$router.push('/Upload')" class="mr-2" prepend-icon="mdi-plus">Upload</v-btn>
       <template v-if="isLoggedIn">
         <v-menu open-on-hover>
@@ -56,7 +62,11 @@ export default {
     isLoggedIn: false,
     items: [],
     notifs: [
-      //{title: "Title", message: "Someone liked your video."},
+    { title: "Title", message: "Someone liked your video." },
+    { title: "Title", message: "Someone liked your video." },
+      // { title: "Title", message: "Someone liked your video." },
+      // { title: "Title", message: "Someone liked your video." },
+      // { title: "Title", message: "Someone liked your video." },
     ],
     pageRoom: "navbar",
   }),
@@ -67,8 +77,6 @@ export default {
     }
   },
   mounted() {
-    console.log("ASDASDASDSA");
-    
     this.items = [
       { title: "View Profile", event: this.viewProfile },
       { title: "Log out", event: this.logout }
