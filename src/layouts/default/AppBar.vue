@@ -15,7 +15,7 @@
           <v-btn v-bind="notifMenu" class="mr-2" icon="mdi-bell-outline" />
         </template>
         <v-list>
-          <v-list-item v-if="notifs.length === 0">
+          <v-list-item v-if="notifs.length === 0" class="">
             <v-list-item-title class="text-center mb-6">No notifications.</v-list-item-title>
             <v-list-item-title v-if="!isLoggedIn" class="text-center">Log in to receive notifications.</v-list-item-title>
           </v-list-item>
