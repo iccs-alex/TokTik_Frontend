@@ -82,13 +82,13 @@ export default {
 
         if (response.status === 200) {
           store.isLoggedIn = true
+          store.username = this.username
           localStorage.setItem("jwt", response.data.token)
           await this.$router.push({ path: "/" });
         } else {
           alert("Registration failed")
         }
       }
-      store.username = this.username
       this.loading = false
     },
     reset() {

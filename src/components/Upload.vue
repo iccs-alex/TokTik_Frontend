@@ -51,6 +51,8 @@ import Vue from "vue";
 import axios from "axios";
 import { ref } from 'vue';
 import crypto from 'crypto-random-string';
+import { useAppStore } from '@/store/app'
+const store = useAppStore()
 
 export default {
   data() {
@@ -71,7 +73,7 @@ export default {
       if (method === "PUT") {
         const key: string = crypto({ length: 16 });
         this.key = key;
-        return this.axios.put("/api/video", { key: key, title: title, description: description }, {headers: {'Authorization': 'Bearer ' + this.token}}).then(response => response.data);
+        return this.axios.put("/api/video", { key: key, username: store.username, title: title, description: description }, {headers: {'Authorization': 'Bearer ' + this.token}}).then(response => response.data);
       }
       else if (method === "GET") {
         return this.axios.get("/api/video?key=" + 'videos/' + title).then(response => response.data);

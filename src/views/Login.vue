@@ -76,7 +76,6 @@ export default {
           alert("Invalid login")
         }
       }
-      store.username = this.username
       this.loading = false
     },
     reset() {

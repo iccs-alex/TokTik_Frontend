@@ -1,18 +1,31 @@
 <template>
     <v-container class="fill-height">
-        <v-responsive class="px-8 py-8 fill-height">
+        <v-responsive class="px-14 py-14 fill-height">
             <h3 class="text-h4 font-weight-bold">Videos</h3>
             <v-btn :loading="loading" prepend-icon="mdi-refresh" class="mb-6 mt-6" @click="getVideos">Refresh</v-btn>
-            <v-row >
+            <v-row>
 
                 <v-col :cols="cols" v-for="video in videos" class="">
-                    <v-card height="450" @click="playVideo(video.key)" style="background-color:transparent" variant="elevated" class="">
+                    <v-card height="400" @click="playVideo(video.key)" style="background-color:transparent"
+                        variant="elevated" class="">
 
                         <!-- If video chunks exist -->
                         <template v-if="video.status == 1">
                             <div class="flex-column">
                                 <v-card-title class="flex">{{ video.title }}</v-card-title>
                                 <v-card-text class="flex">{{ video.description }}</v-card-text>
+                                <v-sheet
+                                    :style="{ backgroundColor: 'transparent', border: '1px solid black', borderColor: $vuetify.theme.current.colors.primary }"
+                                    rounded class="w-100 pa-2 d-flex justify-space-evenly">
+                                    <div class="d-flex" style="gap:10px">
+                                        <v-icon icon="mdi-eye-outline" color="primary" />
+                                        <p>{{ video.viewCount }}</p>
+                                    </div>
+                                    <div class="d-flex" style="gap:10px">
+                                        <v-icon icon="mdi-heart" color="primary" />
+                                        <p>{{ video.likeCount }}</p>
+                                    </div>
+                                </v-sheet>
                                 <v-img :aspect-ratio="9 / 16" class="image" cover :src="video.thumbnail" :id="'thumbnail'">
                                     <template v-slot:placeholder>
                                         <div class="d-flex align-center justify-center fill-height">
@@ -57,12 +70,11 @@ import { socket, joinRoom, leaveRoom } from "@/socket";
 
 export default {
     data() {
-        //let videos = ref([])
         let videos = ref([
-            // { thumbnail: 'https://images.unsplash.com/photo-1608848461950-0fe51dfc41cb?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8fA%3D%3D', key: 'test', title: 'tesdajsndkjasndkjasndkjn skdjna kjdns kdnsasadsadsadt', description: 'test', status: 1, workerStatus: { statusMessage: 'asd' } },
-            // { thumbnail: 'https://images.unsplash.com/photo-1608848461950-0fe51dfc41cb?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8fA%3D%3D', key: 'test', title: 'test', description: 'test', status: 1, workerStatus: { statusMessage: 'asd' } },
-            // { thumbnail: 'https://c4.wallpaperflare.com/wallpaper/586/603/742/minimalism-4k-for-mac-desktop-wallpaper-preview.jpg', key: 'test', title: 'test', description: 'test', status: 1, workerStatus: { statusMessage: 'asd' } },
-            // { thumbnail: 'https://images.unsplash.com/photo-1608848461950-0fe51dfc41cb?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8fA%3D%3D', key: 'test', title: 'test', description: 'test', status: 1, workerStatus: { statusMessage: 'asd' } }
+            // { viewCount: 0, likeCount: 0, thumbnail: 'https://images.unsplash.com/photo-1608848461950-0fe51dfc41cb?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8fA%3D%3D', key: 'test', title: 'tesdajsndkjasndkjasndkjn skdjna kjdns kdnsasadsadsadt', description: 'test', status: 1, workerStatus: { statusMessage: 'asd' } },
+            // { viewCount: 0, likeCount: 0, thumbnail: 'https://images.unsplash.com/photo-1608848461950-0fe51dfc41cb?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8fA%3D%3D', key: 'test', title: 'test', description: 'test', status: 1, workerStatus: { statusMessage: 'asd' } },
+            // { viewCount: 0, likeCount: 0, thumbnail: 'https://c4.wallpaperflare.com/wallpaper/586/603/742/minimalism-4k-for-mac-desktop-wallpaper-preview.jpg', key: 'test', title: 'test', description: 'test', status: 1, workerStatus: { statusMessage: 'asd' } },
+            // { viewCount: 0, likeCount: 0, thumbnail: 'https://images.unsplash.com/photo-1608848461950-0fe51dfc41cb?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8fA%3D%3D', key: 'test', title: 'test', description: 'test', status: 1, workerStatus: { statusMessage: 'asd' } }
         ])
         return {
             videos,
@@ -74,15 +86,22 @@ export default {
     computed: {
         cols() {
             const { lg, sm, xs } = this.$vuetify.display
-            return  lg ? 2
-                    : sm ? 4
+            return lg ? 2
+                : sm ? 4
                     : xs ? 6
-                    : 3
+                        : 3
         },
     },
     mounted() {
         this.getVideos()
         joinRoom(this.pageRoom)
+        socket.on('viewUpdate', (data) => {
+            this.changeVideoCount(data.videoKey, data.viewCount, 'viewCount')
+        })
+        socket.on('likeUpdate', (data) => {
+            this.changeVideoCount(data.videoKey, data.likeCount, 'likeCount')
+        })
+
     },
     unmounted() {
         leaveRoom(this.pageRoom)
@@ -105,9 +124,16 @@ export default {
                 console.log("Message was sent");
             })
         },
+        changeVideoCount(videoKey, count, countType) {
+            for (const [key, video] of Object.entries(this.videos)) {
+                if (video.key === videoKey) {
+                    console.log('The ' + countType + 'is now ' + count)
+                    video[countType] = count
+                }
+            }
+        },
         async getVideos() {
             this.loading = true
-
             try {
                 let videos = await this.axios.get("/api/videos").then(response => response.data);
                 this.videos = ref(videos)

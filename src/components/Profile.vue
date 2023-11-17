@@ -1,21 +1,20 @@
 <template>
     <v-container class="fill-height">
-        <v-responsive class="px-4 py-4 fill-height">
+        <v-responsive class="px-14 py-14 fill-height">
             <h3 class="text-h4 font-weight-bold">Your Videos</h3>
+            <v-btn :loading="loading" prepend-icon="mdi-refresh" class="mb-6 mt-6" @click="getVideos">Refresh</v-btn>
+            <v-row>
 
-            <div class="py-6" />
-            <v-btn :loading="loading" prepend-icon="mdi-refresh" @click="getVideos">Refresh</v-btn>
-            <div class="d-flex justify-space-between mb-12 mt-12 ">
-                <div v-for="video in videos">
+                <v-col :cols="cols" v-for="video in videos" class="">
+                    <v-card height="400" @click="playVideo(video.key)" style="background-color:transparent"
+                        variant="elevated" class="">
 
-                    <v-card @click="playVideo(video.key)" style="background-color:transparent" variant="elevated"
-                        class="mb-10">
+                        <!-- If video chunks exist -->
                         <template v-if="video.status == 1">
                             <div class="flex-column">
-                                <v-card-title class="">{{ video.title }}</v-card-title>
-                                <v-card-text>{{ video.description }}</v-card-text>
-                                <v-img class="d-flex flex-column justify-end align-end" :src="video.thumbnail" width="300" height="300" cover
-                                    :id="'thumbnail'">
+                                <v-card-title class="flex">{{ video.title }}</v-card-title>
+                                <v-card-text class="flex">{{ video.description }}</v-card-text>
+                                <v-img :aspect-ratio="9 / 16" class="image" cover :src="video.thumbnail" :id="'thumbnail'">
                                     <template v-slot:placeholder>
                                         <div class="d-flex align-center justify-center fill-height">
                                             <v-progress-circular color="grey-lighten-4" indeterminate></v-progress-circular>
@@ -27,6 +26,8 @@
                                 </v-img>
                             </div>
                         </template>
+
+                        <!-- If video is being processed -->
                         <template v-else>
                             <div class="d-flex flex-column flex-no-wrap">
                                 <v-progress-linear indeterminate color="tiktokBlue" />
@@ -42,10 +43,11 @@
                                 </div>
                             </div>
                         </template>
-                    </v-card>
 
-                </div>
-            </div>
+                    </v-card>
+                </v-col>
+
+            </v-row>
         </v-responsive>
     </v-container>
 </template>
@@ -55,26 +57,63 @@ import Vue from "vue";
 import axios from "axios";
 import { ref } from 'vue';
 import { socket, joinRoom, leaveRoom } from "@/socket";
+import { useAppStore } from '@/store/app'
+const store = useAppStore()
 
 export default {
     data() {
-        //let videos = ref([])
-        let videos = ref([{thumbnail:'https://images.unsplash.com/photo-1608848461950-0fe51dfc41cb?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8fA%3D%3D', key: 'test', title: 'test', description: 'test', status: 1, workerStatus: { statusMessage: 'asd' } }])
+        let videos = ref([
+            // { thumbnail: 'https://images.unsplash.com/photo-1608848461950-0fe51dfc41cb?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8fA%3D%3D', key: 'test', title: 'tesdajsndkjasndkjasndkjn skdjna kjdns kdnsasadsadsadt', description: 'test', status: 1, workerStatus: { statusMessage: 'asd' } },
+            // { thumbnail: 'https://images.unsplash.com/photo-1608848461950-0fe51dfc41cb?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8fA%3D%3D', key: 'test', title: 'test', description: 'test', status: 1, workerStatus: { statusMessage: 'asd' } },
+            // { thumbnail: 'https://c4.wallpaperflare.com/wallpaper/586/603/742/minimalism-4k-for-mac-desktop-wallpaper-preview.jpg', key: 'test', title: 'test', description: 'test', status: 1, workerStatus: { statusMessage: 'asd' } },
+            // { thumbnail: 'https://images.unsplash.com/photo-1608848461950-0fe51dfc41cb?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8fA%3D%3D', key: 'test', title: 'test', description: 'test', status: 1, workerStatus: { statusMessage: 'asd' } }
+        ])
         return {
             videos,
             loading: false,
             token: localStorage.getItem("jwt"),
+            pageRoom: 'home'
         }
     },
     mounted() {
         this.getVideos()
+        joinRoom(this.pageRoom)
+    },
+    unmounted() {
+        leaveRoom(this.pageRoom)
+    },
+    computed: {
+        cols() {
+            const { lg, sm, xs } = this.$vuetify.display
+            return lg ? 2
+                : sm ? 4
+                    : xs ? 6
+                        : 3
+        },
     },
     methods: {
+        connectSocket() {
+            console.log("Connect");
+
+            socket.connect()
+        },
+        disconnectSocket() {
+            console.log("Disconnect");
+
+            socket.disconnect()
+        },
+        sendMessage() {
+            console.log("Sending message");
+
+            socket.timeout(5000).emit("Create Something", "ThisIsAMessage", () => {
+                console.log("Message was sent");
+            })
+        },
         async getVideos() {
             this.loading = true
 
             try {
-                let videos = await this.axios.get("/api/videos").then(response => response.data);
+                let videos = await this.axios.get("/api/videos/user?username=" + store.username, { headers: { 'Authorization': 'Bearer ' + this.token } }).then(response => response.data);
                 this.videos = ref(videos)
                 for (let i = 0; i < videos.length; i++) {
                     const playlist_url = await this.axios.get("/api/video?key=chunked_videos/" + videos[i].key + "/playlist.m3u8").then(response => response.data)

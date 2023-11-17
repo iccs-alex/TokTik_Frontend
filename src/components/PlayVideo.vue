@@ -36,7 +36,7 @@
           </div>
           <div class="d-flex" style="gap:10px">
             <v-icon icon="mdi-message-processing-outline" color="tiktokBlue" />
-            <p>{{ comments.length }}</p>
+            <p>{{ commentCount }}</p>
           </div>
         </v-sheet>
 
@@ -85,17 +85,18 @@ export default {
     joinRoom(this.pageRoom)
     socket.on('viewUpdate', (data) => {
       console.log('The view count is now' + data)
-      this.viewCount = data
+      this.viewCount = data.viewCount
     })
     socket.on('likeUpdate', (data) => {
       console.log('The like count is now' + data)
-      this.likeCount = data
+      this.likeCount = data.likeCount
     })
     socket.on('commentUpdate', async () => {
       console.log('Getting comments')
       try {
         const res = await this.axios.get('/api/video/comments?key=' + this.$route.params.key)
         this.comments = res.data
+        this.commentCount = this.comments.length
       } catch (e) {
 
       }
@@ -122,8 +123,9 @@ export default {
       liked: false,
       route: null,
       pageRoom: 'video:' + this.$route.params.key,
-      viewCount: null,
-      likeCount: null,
+      viewCount: 0,
+      likeCount: 0,
+      commentCount: 0,
       comments: [
         // { username: "Hello", comment: "World" },
         // { username: "Hello", comment: "World" },
@@ -173,6 +175,9 @@ export default {
         console.log(videoDetails);
         console.log(videoDetails.videoComments);
         this.comments = videoDetails.videoComments
+        if(this.comments) {
+          this.commentCount = this.comments.length
+        }
         this.likeCount = videoDetails.likeCount
         this.liked = videoDetails.userLikes.includes(store.username)
         console.log("NO ERROR")
@@ -219,8 +224,6 @@ export default {
       }
 
       this.commentSubmitLoading = true
-      console.log(this.commenting);
-
       try {
         const res = await this.axios.post('/api/video/comment?key=' + this.$route.params.key + '&username=' + store.username, { comment: this.commenting })
       } catch (e) {
@@ -228,7 +231,6 @@ export default {
       }
 
       joinRoom('notifComment:'+this.$route.params.key)
-
       this.commenting = '';
       this.commentSubmitLoading = false
     },

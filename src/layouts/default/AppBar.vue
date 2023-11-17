@@ -36,7 +36,7 @@
       <template v-if="isLoggedIn">
         <v-menu open-on-hover>
           <template v-slot:activator="{ props }">
-            <v-btn icon="mdi-account" v-bind="props"></v-btn>
+            <v-btn append-icon="mdi-account" v-bind="props" style="text-transform: unset !important;">{{ username }}</v-btn>
           </template>
 
           <v-list>
@@ -60,10 +60,11 @@ const store = useAppStore()
 export default {
   data: () => ({
     isLoggedIn: false,
+    username: store.username,
     items: [],
     notifs: [
-    { title: "Title", message: "Someone liked your video." },
-    { title: "Title", message: "Someone liked your video." },
+      // { title: "Title", message: "Someone liked your video." },
+      // { title: "Title", message: "Someone liked your video." },
       // { title: "Title", message: "Someone liked your video." },
       // { title: "Title", message: "Someone liked your video." },
       // { title: "Title", message: "Someone liked your video." },
@@ -87,7 +88,6 @@ export default {
     joinRoom(this.pageRoom)
     socket.on('notifUpdate', async () => {
       if (!store.isLoggedIn) {
-        console.log("Not logged in");
         return;
       }
       console.log('Getting notifs')
@@ -97,6 +97,9 @@ export default {
   },
   methods: {
     async getNotifs() {
+      if(!store.isLoggedIn) {
+        return
+      }
       try {
         const res = await this.axios.get('/api/notifs?username=' + store.username)
         console.log(res.data);

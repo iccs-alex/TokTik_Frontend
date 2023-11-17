@@ -13,10 +13,12 @@ socket.connect();
 state.connected = true;
 
 export function joinRoom(roomName) {
+  console.log("Joined room: " + roomName);
   socket.emit('joinRoom', roomName);
 }
 
 export function leaveRoom(roomName) {
+  console.log("Left room: " + roomName);
   socket.emit('leaveRoom', roomName);
 }
 
