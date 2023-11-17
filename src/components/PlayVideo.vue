@@ -18,8 +18,8 @@
       <div class="flex-grow-1 pa-4 flex-column d-flex" style="gap:15px">
 
         <v-card variant="elevated">
-          <v-card-title>Title</v-card-title>
-          <v-card-text>Description</v-card-text>
+          <v-card-title>{{ title }}</v-card-title>
+          <v-card-text>{{ description }}</v-card-text>
         </v-card>
 
         <v-sheet
@@ -126,6 +126,8 @@ export default {
       viewCount: 0,
       likeCount: 0,
       commentCount: 0,
+      title: '',
+      description: '',
       comments: [
         // { username: "Hello", comment: "World" },
         // { username: "Hello", comment: "World" },
@@ -173,17 +175,16 @@ export default {
         const res = await this.axios.get('/api/video/details?key=' + this.$route.params.key)
         const videoDetails = res.data
         console.log(videoDetails);
-        console.log(videoDetails.videoComments);
         this.comments = videoDetails.videoComments
         if(this.comments) {
           this.commentCount = this.comments.length
         }
+        this.title = videoDetails.title
+        this.description = videoDetails.description
         this.likeCount = videoDetails.likeCount
-        this.liked = videoDetails.userLikes.includes(store.username)
-        console.log("NO ERROR")
-
+        if(store.username !== undefined)
+          this.liked = videoDetails.userLikes.includes(store.username)
       } catch (e) {
-        console.log("ERROR")
       }
     },
     async incrementView() {
