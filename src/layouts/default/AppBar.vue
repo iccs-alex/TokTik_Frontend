@@ -10,7 +10,7 @@
       <v-btn @click="toggleTheme" class="mr-2" icon="mdi-theme-light-dark" />
 
       <!-- Notifications Menu -->
-      <v-menu transition="scale-transition" width="420" location="bottom center">
+      <v-menu transition="scale-transition" width="420" location="bottom center" :close-on-content-click="false">
         <template v-slot:activator="{ props: notifMenu }">
           <v-btn v-bind="notifMenu" class="mr-2" icon="mdi-bell-outline" />
         </template>

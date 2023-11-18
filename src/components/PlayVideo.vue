@@ -1,11 +1,12 @@
 <template>
-  <div class="w-100 h-100 d-flex flex-column">
+  <div class="w-100 h-screen d-flex flex-column">
     <div class="d-flex flex-grow-1">
       <!-- Video Section -->
-      <div style="width: 70%" class="h-100">
-        <div style="position:relative" class="w-100 h-100">
-          <video ref="videoPlayer" style="position:relative;top:0px;left:0px"
-            class="w-100 h-100 video-js vjs-default-skin videoPlayer" loop>
+      <div style="width: 70%" class="">
+        <div style="position:relative;" :style="{backgroundColor: $vuetify.theme.current.colors.secondary}" class="w-100 h-100">
+          <v-icon size="50" class="ma-4" @click="$router.push('/')" icon="mdi-arrow-left-circle"></v-icon>
+          <video ref="videoPlayer" style="position:relative;top:0px;left:0px;"
+            class="w-100 video-js vjs-default-skin videoPlayer" loop>
             <source style="position: relative;top:0px;left:0px" class="w-100 h-100" type="application/x-mpegURL" />
           </video>
           <v-progress-circular style="z-index: 1;position: absolute;top:50%;left:50%;transform: translate(-50%);"
@@ -126,8 +127,8 @@ export default {
       viewCount: 0,
       likeCount: 0,
       commentCount: 0,
-      title: '',
-      description: '',
+      title: '. . .',
+      description: '. . .',
       comments: [
         // { username: "Hello", comment: "World" },
         // { username: "Hello", comment: "World" },

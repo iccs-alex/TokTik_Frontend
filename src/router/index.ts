@@ -22,12 +22,6 @@ const routes = [
         },
       },
       {
-        path: 'PlayVideo/:key',
-        name: 'PlayVideo',
-        component: () => import('@/components/PlayVideo.vue'),
-        
-      },
-      {
         path: 'Profile/:userId',
         name: 'Profile',
         component: () => import('@/components/Profile.vue'),
@@ -37,6 +31,12 @@ const routes = [
       },
 
     ],
+  },
+  {
+    path: '/PlayVideo/:key',
+    name: 'PlayVideo',
+    component: () => import('@/components/PlayVideo.vue'),
+    children: []
   },
   {
     path: '/login',
