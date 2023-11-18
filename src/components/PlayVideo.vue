@@ -1,13 +1,13 @@
 <template>
-  <div class="w-100 h-screen d-flex flex-column">
-    <div class="d-flex flex-grow-1">
+  <div class="w-100 h-screen d-flex flex-column" style="overflow: hidden;">
+    <div class="d-flex h-100 flex-grow-1">
       <!-- Video Section -->
-      <div style="width: 70%" class="">
+      <div style="width: 70%" class="h-100">
         <div style="position:relative;" :style="{backgroundColor: $vuetify.theme.current.colors.secondary}" class="w-100 h-100">
-          <v-icon size="50" class="ma-4" @click="$router.push('/')" icon="mdi-arrow-left-circle"></v-icon>
+          <v-icon :style="{'opacity': 0.4}" style="z-index: 10;position:absolute;top:15px;left:15px" size="55" @click="$router.push('/')" icon="mdi-arrow-left-circle"></v-icon>
           <video ref="videoPlayer" style="position:relative;top:0px;left:0px;"
-            class="w-100 video-js vjs-default-skin videoPlayer" loop>
-            <source style="position: relative;top:0px;left:0px" class="w-100 h-100" type="application/x-mpegURL" />
+            class="w-100 h-100 video-js vjs-default-skin videoPlayer" loop>
+            <source style="position: relative;top:0px;left:0px" type="application/x-mpegURL" />
           </video>
           <v-progress-circular style="z-index: 1;position: absolute;top:50%;left:50%;transform: translate(-50%);"
             v-if="videoLoading" color="blue-lighten-3" indeterminate :size="50"></v-progress-circular>
@@ -41,10 +41,10 @@
           </div>
         </v-sheet>
 
-        <div class="flex-grow-1">
+        <div class="flex-grow-1" style="height: 0px;display: flex;flex-direction: column;">
           <h3 class="text-center mt-4 mb-3">- - - - Comments - - - -</h3>
 
-          <v-virtual-scroll :items="comments" height="450">
+          <v-virtual-scroll :items="comments">
             <template v-slot:default="{ item }">
               <v-card variant="elevated" class="mb-4">
                 <v-card-title>{{ item.username }}</v-card-title>
@@ -129,14 +129,15 @@ export default {
       commentCount: 0,
       title: '. . .',
       description: '. . .',
+      hover: false,
       comments: [
-        // { username: "Hello", comment: "World" },
-        // { username: "Hello", comment: "World" },
-        // { username: "Hello", comment: "World" },
-        // { username: "Hello", comment: "World" },
-        // { username: "Hello", comment: "World" },
-        // { username: "Hello", comment: "World" },
-        // { username: "Hello", comment: "World" },
+         { username: "Hello", comment: "World" },
+         { username: "Hello", comment: "World" },
+         { username: "Hello", comment: "World" },
+         { username: "Hello", comment: "World" },
+         { username: "Hello", comment: "World" },
+         { username: "Hello", comment: "World" },
+         { username: "Hello", comment: "World" },
       ],
       commenting: '',
     }

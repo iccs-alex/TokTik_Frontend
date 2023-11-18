@@ -71,10 +71,10 @@ import { socket, joinRoom, leaveRoom } from "@/socket";
 export default {
     data() {
         let videos = ref([
-            { viewCount: 0, likeCount: 0, thumbnail: 'https://images.unsplash.com/photo-1608848461950-0fe51dfc41cb?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8fA%3D%3D', key: 'test', title: 'tesdajsndkjasndkjasndkjn skdjna kjdns kdnsasadsadsadt', description: 'test', status: 1, workerStatus: { statusMessage: 'asd' } },
-            { viewCount: 0, likeCount: 0, thumbnail: 'https://images.unsplash.com/photo-1608848461950-0fe51dfc41cb?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8fA%3D%3D', key: 'test', title: 'test', description: 'test', status: 1, workerStatus: { statusMessage: 'asd' } },
-            { viewCount: 0, likeCount: 0, thumbnail: 'https://c4.wallpaperflare.com/wallpaper/586/603/742/minimalism-4k-for-mac-desktop-wallpaper-preview.jpg', key: 'test', title: 'test', description: 'test', status: 1, workerStatus: { statusMessage: 'asd' } },
-            { viewCount: 0, likeCount: 0, thumbnail: 'https://images.unsplash.com/photo-1608848461950-0fe51dfc41cb?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8fA%3D%3D', key: 'test', title: 'test', description: 'test', status: 1, workerStatus: { statusMessage: 'asd' } }
+            // { viewCount: 0, likeCount: 0, thumbnail: 'https://images.unsplash.com/photo-1608848461950-0fe51dfc41cb?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8fA%3D%3D', key: 'test', title: 'tesdajsndkjasndkjasndkjn skdjna kjdns kdnsasadsadsadt', description: 'test', status: 1, workerStatus: { statusMessage: 'asd' } },
+            // { viewCount: 0, likeCount: 0, thumbnail: 'https://images.unsplash.com/photo-1608848461950-0fe51dfc41cb?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8fA%3D%3D', key: 'test', title: 'test', description: 'test', status: 1, workerStatus: { statusMessage: 'asd' } },
+            // { viewCount: 0, likeCount: 0, thumbnail: 'https://c4.wallpaperflare.com/wallpaper/586/603/742/minimalism-4k-for-mac-desktop-wallpaper-preview.jpg', key: 'test', title: 'test', description: 'test', status: 1, workerStatus: { statusMessage: 'asd' } },
+            // { viewCount: 0, likeCount: 0, thumbnail: 'https://images.unsplash.com/photo-1608848461950-0fe51dfc41cb?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8fA%3D%3D', key: 'test', title: 'test', description: 'test', status: 1, workerStatus: { statusMessage: 'asd' } }
         ])
         return {
             videos,
